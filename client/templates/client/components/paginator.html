@@ -1,0 +1,43 @@
+<div class="d-flex justify-content-between">
+    <span class="current">
+        Page {{ page_obj.number }} of {{ paginator.num_pages }}
+    </span>
+
+
+    <nav aria-label="">
+        <ul class="pagination">
+            <li class="page-item {% if not page_obj.has_previous %} disabled {% endif %}">
+                <a class="page-link" href="?page={% if page_obj.has_previous %}{{ page_obj.previous_page_number }}{% endif %}&page_size={{paginator.per_page}}&q={{request.GET.q}}
+            ">
+                    Previous
+                </a>
+            </li>
+
+            {% for i in paginator.get_elided_page_range %}
+            {% if page_obj.number == i %}
+            <li class="active page-item">
+                <span class="page-link">{{ i }}</span>
+            </li>
+            {% else %}
+            {% if i == paginator.ELLIPSIS %}
+            <li
+                class="page-item {% if not page_obj.number in paginator.get_elided_page_range %}active{%endif %}">
+                <span class="page-link">{{ i }}</span>
+            </li>
+            {% else %}
+            <li class="page-item">
+                <a class="page-link"
+                    href="?page={{ i }}&page_size={{paginator.per_page}}&q={{request.GET.q}}">{{ i }}</a>
+            </li>
+            {% endif %}
+            {% endif %}
+            {% endfor %}
+
+            <li class="page-item {% if not page_obj.has_next %} disabled {% endif %}">
+                <a class="page-link" href="?page={% if page_obj.has_next %}{{ page_obj.next_page_number }}{% endif %}&page_size={{paginator.per_page}}&q={{request.GET.q}}
+                  ">Next
+                </a>
+            </li>
+        </ul>
+    </nav>
+</div><!-- End Basic Pagination -->

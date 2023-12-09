@@ -12,8 +12,6 @@ urlpatterns = [
      # FAQ
     path('about', views.About.as_view()),
 
-   
-   
     # -------- admin urls starts here --------
     # Dashboard
     path('admin/dashboard', views.DashboardView.as_view()),
