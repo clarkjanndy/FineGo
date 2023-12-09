@@ -1,0 +1,120 @@
+{% load static %}
+<ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark">
+
+    <!-- Sidebar - Brand -->
+    <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.html">
+        <img src="{% static 'client/img/FineGo-no-bg.png' %}" width="100" class="d-none d-md-block">
+    </a>
+
+    <!-- Divider -->
+    <hr class="sidebar-divider my-0">
+
+    <!-- Nav Item - Dashboard -->
+    <li class="nav-item {% if current_page == 'admin-dashboard' %}active{% endif %}">
+        <a class="nav-link" href="/admin/dashboard">
+            <i class="bi bi-grid"></i>
+            <span>Dashboard</span>
+        </a>
+    </li>
+
+    <!-- Divider -->
+    <hr class="sidebar-divider">
+
+    <!-- Heading -->
+    <div class="sidebar-heading">
+        Users
+    </div>
+
+    <!-- Nav Item - Users -->
+    <li class="nav-item">
+        <a class="nav-link" href="/admin/dashboard">
+            <i class="bi bi-house"></i>
+            <span>Departments</span>
+        </a>
+    </li>
+
+    <!-- Nav Item - Users -->
+    <li class="nav-item">
+        <a class="nav-link" href="/admin/dashboard">
+            <i class="bi bi-people"></i>
+            <span> Users</span>
+        </a>
+    </li>
+
+     <!-- Divider -->
+     <hr class="sidebar-divider">
+
+     <!-- Heading -->
+     <div class="sidebar-heading">
+         Activities
+     </div>
+
+    <!-- Nav Item - Manage Activities -->
+    <li class="nav-item">
+        <a class="nav-link" href="/admin/dashboard">
+            <i class="bi bi-activity"></i>
+            <span> Manage Activities</span>
+        </a>
+    </li>
+
+    <!-- Nav Item - Manage Activities -->
+    <li class="nav-item">
+        <a class="nav-link" href="/admin/dashboard">
+            <i class="bi bi-calendar-event"></i>
+            <span> On-going Events</span>
+        </a>
+    </li>
+
+      <!-- Divider -->
+    <hr class="sidebar-divider">
+
+    <!-- Heading -->
+    <div class="sidebar-heading">
+        Others
+    </div>
+
+    <!-- Nav Item - FAQs-->
+    <li class="nav-item {% if current_page == 'manage-faqs' %}active{% endif %}">
+        <a class="nav-link" href="/admin/manage-faqs">
+            <i class="bi bi-question-square"></i>
+            <span>Manage FAQs</span>
+        </a>
+    </li>
+    
+
+    <!-- Nav Item - Settings -->
+    <li class="nav-item {% if current_page == 'manage-system-informations' %}active{% endif %}">
+        <a class="nav-link" href="/admin/manage-system-informations">
+            <i class="bi bi-exclamation-square"></i>
+            <span>System Informations</span>
+        </a>
+    </li>
+
+    <!-- Divider -->
+    <hr class="sidebar-divider">
+
+
+    <!-- Nav Item - Settings -->
+    <li class="nav-item {% if current_page == 'about' %}active{% endif %}">
+        <a class="nav-link" href="/about">
+            <i class="bi bi-exclamation"></i>
+            <span>About</span>
+        </a>
+    </li>
+
+     <!-- Nav Item - Settings -->
+     <li class="nav-item {% if current_page == 'faq' %}active{% endif %}">
+        <a class="nav-link" href="/faq">
+            <i class="bi bi-question"></i>
+            <span>FAQs</span>
+        </a>
+    </li>
+    
+
+    <!-- Sidebar Toggler (Sidebar) -->
+    <!-- <div class="text-center d-none d-md-inline">
+        <button class="rounded-circle border-0" id="sidebarToggle"></button>
+    </div> -->
+
+</ul>
+<!-- End of Sidebar -->

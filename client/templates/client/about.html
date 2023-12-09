@@ -1,0 +1,59 @@
+{% extends "client/app.html"%}
+
+{% load static %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+    <!-- Page Heading -->
+    <div>
+        <h1 class="h3 mb-0 text-gray-800">About</h1>
+
+        <div aria-label="breadcrumb">
+            <ol class="breadcrumb" style="background-color: inherit;">
+                <li class="breadcrumb-item active" aria-current="page">About</li>
+                <li class="breadcrumb-item active" aria-current="page"></li>
+            </ol>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="container-fluid">
+            <div id="accordion">
+                {% for inf in systeminformation_list %}
+                <div class="card">
+                    <div class="card-header" id="heading {{inf.id}}">
+                        <h5 class="mb-0">
+                            <button class="btn btn-link" data-toggle="collapse" data-target="#collapse{{inf.id}}"
+                                aria-expanded="true" aria-controls="collapseOne">
+                               {{inf.title}}
+                            </button>
+                        </h5>
+                    </div>
+
+                    <div id="collapse{{inf.id}}" class="collapse show" aria-labelledby="heading{{inf.id}}"
+                        data-parent="#accordion">
+                        <div class="card-body">
+                            {{inf.content}}
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="d-flex justify-content-center text-primary align-items-center">
+                    <div class="text-center">
+                        <i class="bi bi-exclamation-diamond-fill" style="font-size: 250px;"></i>
+                        <h5>There is nothing to show here.</h5>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+
+
+</div>
+
+
+{%endblock content%}

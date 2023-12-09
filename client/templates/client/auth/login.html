@@ -1,0 +1,151 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>FineGo</title>
+
+    <!-- Custom fonts for this template-->
+    <link href="{% static 'client/vendor/fontawesome-free/css/all.min.css'%}" rel="stylesheet" type="text/css">
+    <link
+        href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+        rel="stylesheet">
+
+    <!-- Custom styles for this template-->
+    <link href="{% static 'client/css/sb-admin-2.min.css'%}" rel="stylesheet">
+
+</head>
+
+<body class="bg-gradient-primary">
+
+    <div class="container">
+
+        <!-- Outer Row -->
+        <div class="row justify-content-center">
+
+            <div class="col-xl-5 col-lg-6 col-md-9">
+
+                <div class="card o-hidden border-0 shadow-lg my-5">
+                    <div class="card-body p-0">
+                        <!-- Nested Row within Card Body -->
+                        <div class="row">
+
+                            <div class="col-lg-12">
+                                <div class="p-5">
+                                    <div class="text-center">
+                                        <img src="{% static 'client/img/FineGo.png' %}" width="200">
+                                        <p>Enter your credentials to login.</p>
+                                    </div>
+                                    <form class="user" id="loginForm">
+                                        <div class="alert alert-danger alert-dismissible fade show d-none" role="alert"
+                                            id="alertContainer">
+                                            <span id="alertMessage"></span>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="username">Username:</label>
+                                            <input type="email" class="form-control " id="username" name="username"
+                                                aria-describedby="emailHelp" placeholder="Username">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="password">Password:</label>
+                                            <input type="password" class="form-control " id="password" name="password"
+                                                placeholder="Password">
+                                        </div>
+
+                                        <div class="form-group form-check">
+                                            <input type="checkbox" class="form-check-input" id="exampleCheck1">
+                                            <label class="form-check-label" for="exampleCheck1">Remember me</label>
+                                        </div>
+
+
+                                        <button type="submit" class="btn btn-primary  btn-block">Login</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <script script src=" {% static 'client/vendor/others/sweetalert.min.js' %}"></script>
+    <script script src=" {% static 'client/vendor/others/just-validate.min.js' %}"></script>
+
+    <script>
+        const loginForm = document.getElementById('loginForm');
+        const loginFormValidator = new window.JustValidate('#loginForm', {
+            errorFieldCssClass: 'is-invalid',
+        });
+
+        loginFormValidator
+            .addField('#username', [{
+                rule: 'required',
+                errorMessage: 'This field is required',
+            },])
+            .addField('#password', [{
+                rule: 'required',
+                errorMessage: 'This field is required',
+            },])
+            .onSuccess((event) => {
+                event.preventDefault();
+                // Make your API call here (e.g., using the fetch() method)
+                const url = 'api/v1/login';
+                const formData = new FormData(loginForm);
+                const payload = {
+                    headers: {
+                        "X-CSRFToken": "{{csrf_token}}"
+                    },
+                    method: 'POST',
+                    body: formData,
+                }
+
+                fetch(url, payload)
+                    .then(response => response.json())
+                    .then(response => {
+                        // process success here
+                        if (response.status === 'success') {
+                            window.location.href = '/admin/dashboard';
+
+                            // process failed here  
+                        } else {
+                            // show error message on alert container
+                            const alertContainer = document.getElementById('alertContainer');
+                            const alertMessage = document.getElementById('alertMessage');
+
+                            alertMessage.innerText = 'Invalid username and/or password.'
+                            alertContainer.classList.remove('d-none');
+
+                            // remove it after a span of seconds
+                            setTimeout(() => {
+                                alertContainer.classList.add('d-none');
+                            }, 3000);
+                        }
+                    })
+                    .catch(error => {
+                        console.log(error)
+
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: 'Something went wrong!',
+                            confirmButtonColor: '#4154f1',
+                        })
+                    });
+            });
+    </script>
+
+</body>
+
+</html>
