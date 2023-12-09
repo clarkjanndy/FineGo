@@ -16,6 +16,10 @@ urlpatterns = [
     path('users/<int:pk>', views.UserById.as_view()),
     path('users/<int:pk>/activate-or-deactivate', views.UserActivateDeactivate.as_view()),
 
+    # Department
+    path('departments', views.DepartmentListCreate.as_view()),
+    path('departments/<int:pk>', views.DepartmentById.as_view()),
+   
     # FAQ
     path('faqs', views.FAQListCreate.as_view()),
     path('faqs/<int:pk>', views.FAQById.as_view()),
