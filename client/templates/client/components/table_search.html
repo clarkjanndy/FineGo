@@ -2,7 +2,6 @@
 <form class="d-flex justify-content-between mb-3">
     <div class="form-group d-flex align-items-center">
         <select class="form-control" name="page_size" onchange="this.form.submit()">
-            <option value="5" {% if paginator.per_page == 5 %}selected{% endif %}>5</option>
             <option value="10" {% if paginator.per_page == 10 %}selected{% endif %}>10</option>
             <option value="20" {% if paginator.per_page == 20 %}selected{% endif %}>20</option>
             <option value="30" {% if paginator.per_page == 30 %}selected{% endif %}>30</option>

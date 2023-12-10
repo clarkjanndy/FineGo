@@ -3,12 +3,17 @@ from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.admin import UserAdmin as DefaultUserAdmin
 
 from . models import (
+    Department,
     User, 
     FAQ, 
     SystemInformation
 )
 
 # Register your admin manager here
+class DepartmentAdmin(admin.ModelAdmin):
+    list_display = ('name', 'abbreviation',)
+    search_fields = ('name', 'abbreviation',)
+
 class UserAdmin(DefaultUserAdmin):
     list_display = ('username', 'email', 'last_login', 'is_superuser', 'date_joined')
 
@@ -29,6 +34,7 @@ class SystemInformationAdmin(admin.ModelAdmin):
     search_fields = ('title', 'content',)
 
 # Register your models here.
+admin.site.register(Department, DepartmentAdmin)
 admin.site.register(User, UserAdmin)
 admin.site.register(FAQ, FAQAdmin)
 admin.site.register(SystemInformation, SystemInformationAdmin)

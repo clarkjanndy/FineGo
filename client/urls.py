@@ -16,6 +16,9 @@ urlpatterns = [
     # Dashboard
     path('admin/dashboard', views.DashboardView.as_view()),
 
+    # Department
+    path('admin/departments', views.DepartmentList.as_view()),
+
     # FAQ
     path('admin/manage-faqs', views.FAQList.as_view()),
 
