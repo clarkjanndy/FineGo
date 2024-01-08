@@ -18,11 +18,16 @@ class UserSerializer(CustomModelSerializer):
         }
     
     def validate(self, attrs):
+        request = self.context.get('request')
+        user = request.user
         attrs = super().validate(attrs)
 
         if attrs.get('role') == 'student' and not attrs.get('student_id'):
             raise ValidationError({'student_id': 'This field is required.'})
         
+        if attrs.get('role') == 'student' and self.instance == user:
+             raise ValidationError({"role": "Unable to update role for current logged in user."})           
+            
         # ignore photo if null or a Falsy value is passed
         if 'photo' in attrs and not attrs.get('photo'):
             attrs.pop('photo')
@@ -33,5 +38,27 @@ class UserSerializer(CustomModelSerializer):
         # set the username as password and the hash
         hashed_password = make_password(validated_data['username'])
         validated_data.update({"password": hashed_password})
+        
+        # set superuser and is_staff flag to true if role is admin
+        if 'role' in validated_data:
+            if validated_data['role'] == 'admin':
+                validated_data['is_superuser'] = True
+                validated_data['is_staff'] = True
                 
         return super().create(validated_data)
+    
+    def update(self, instance, validated_data):
+        request = self.context.get('request')
+        user = request.user
+        
+        # set superuser and is_staff flag to true if role is admin
+        if 'role' in validated_data:
+            if validated_data['role'] == 'admin':
+                validated_data['is_superuser'] = True
+                validated_data['is_staff'] = True
+
+            else:
+                validated_data['is_superuser'] = False
+                validated_data['is_staff'] = False
+                
+        return super().update(instance, validated_data)

@@ -25,12 +25,6 @@ class User(AbstractUser):
     student_id = models.CharField(max_length=150, null=True, unique=True)
     photo = models.ImageField(upload_to='user/photos/', blank=True, null=True)
     bio = models.TextField(blank=True, null=True)
-
-    def save(self, *args, **kwargs):       
-        self.is_staff = True if self.role == 'admin' or self.is_staff else False
-        self.is_superuser = True if self.role == 'admin' or self.is_superuser else False
-    
-        return super().save(*args, **kwargs)
     
     @property
     def get_full_name(self):
