@@ -11296,3 +11296,9 @@ footer.sticky-footer .copyright {
 body.sidebar-toggled footer.sticky-footer {
   width: 100%;
 }
+
+.label{
+  font-weight: bold;
+  color: rgba(1, 41, 112, 0.6);
+}
+  

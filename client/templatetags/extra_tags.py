@@ -31,15 +31,6 @@ def long_gender(string: str):
 
     return MAPPING.get(string)
 
-@register.filter()
-def long_gender(string: str):
-    MAPPING = {
-        "M":  "Male",
-        "F":  "Female"
-    }
-
-    return MAPPING.get(string)
-
 
 
 

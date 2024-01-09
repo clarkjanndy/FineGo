@@ -65,7 +65,7 @@
                             <td>{{person.get_status|title}}</td>
                             <!-- Action Buttons -->
                             <td>
-                                <a class="btn btn-sm btn-success" href="/admin/manage-users/{{user.id}}"><i
+                                <a class="btn btn-sm btn-success" href="/admin/manage-users/{{person.id}}"><i
                                         class="bi bi-eye-fill"></i></a>
                                 <button class="btn btn-sm btn-primary" record-id="{{person.id}}"
                                     action="{% if person.is_active %}deactive{% else %}activate{% endif %}"

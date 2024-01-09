@@ -6,7 +6,7 @@ from api.models import Department, User
 
 from . custom_mixins import AdminRequiredMixin, LoginRequiredMixin
 
-__all__ = ['DepartmentList', 'UserList', 'UserCreate'] 
+__all__ = ['DepartmentList', 'UserList', 'UserCreate', 'UserDetail'] 
 
 class DepartmentList(AdminRequiredMixin, ListView):
     template_name = 'client/admin/department/list.html'
@@ -79,23 +79,23 @@ class UserCreate(AdminRequiredMixin, TemplateView):
         context.update({'current_page': 'manage-users'})
         return context
     
-# class UserDetail(AdminRequiredMixin, DetailView):
-#     model = Department
-#     template_name = 'frontend/admin/user/detail.html'
-#     context_object_name = 'person'
+class UserDetail(AdminRequiredMixin, DetailView):
+    model = User
+    template_name = 'client/admin/user/detail.html'
+    context_object_name = 'person'
 
-#     def get_context_data(self, **kwargs):
-#         context = super().get_context_data(**kwargs)
-#         context.update({'current_page': 'manage-user'})
-#         return context
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({'current_page': 'manage-users'})
+        return context
     
-# class UserMyProfile(LoginRequiredMixin, TemplateView):
-#     template_name = 'frontend/my-profile.html'
+class UserMyProfile(LoginRequiredMixin, TemplateView):
+    template_name = 'client/my-profile.html'
 
-#     def get_context_data(self, **kwargs):
-#         context = super().get_context_data(**kwargs)
-#         context.update({'current_page': 'my-profile'})
-#         return context
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({'current_page': 'my-profile'})
+        return context
 
 
 

@@ -26,6 +26,7 @@ urlpatterns = [
     # User
     path('admin/manage-users', views.UserList.as_view()),
     path('admin/manage-users/create', views.UserCreate.as_view()),
+    path('admin/manage-users/<int:pk>', views.UserDetail.as_view()),
 
     # FAQ
     path('admin/manage-faqs', views.FAQList.as_view()),

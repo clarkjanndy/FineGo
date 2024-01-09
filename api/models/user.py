@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.conf import settings
 
 __all__ = ['User']
 
@@ -36,6 +37,18 @@ class User(AbstractUser):
         return f'{first_name_0} {self.last_name}'
     
     @property
+    def get_abbreviated_name(self):
+        abbr = ''
+        if self.first_name:
+            abbr += self.first_name[0]
+        if self.last_name:
+            abbr += self.last_name[0]
+        return abbr
+    
+    @property
     def get_status(self):
         return 'active' if self.is_active else 'inactive'
     
+    @property
+    def default_photo_url(self):        
+        return f"{settings.STATIC_URL}client/img/default-profile.webp"
