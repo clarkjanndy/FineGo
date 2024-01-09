@@ -1,0 +1,141 @@
+{% extends "client/app.html"%}
+
+{% load static %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+    <!-- Page Heading -->
+    <div>
+        <h1 class="h3 mb-0 text-gray-800">Users</h1>
+
+        <div aria-label="breadcrumb">
+            <ol class="breadcrumb" style="background-color: inherit;">
+                <li class="breadcrumb-item active" aria-current="page">Users</li>
+                <li class="breadcrumb-item" aria-current="page"></li>
+            </ol>
+        </div>
+    </div>
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">List of Users</h6>
+        </div>
+        <div class="card-body">
+
+
+            <div class="table-responsive">
+
+                <div class="d-flex justify-content-end mb-4">
+                    <a href="/admin/manage-users/create" class="btn btn-primary">
+                        <i class="bi bi-plus-square"></i> Create Users
+                    </a>
+                </div>
+
+                {% include 'client/components/table_search.html' %}
+
+                <!-- Django messages -->
+                {% if messages %}
+                {% for message in messages %}
+                {% include 'client/components/alert.html' %}
+                {% endfor %}
+                {% endif %}
+
+                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Name</th>
+                            <th scope="col">Email</th>
+                            <th scope="col">Mobile</th>
+                            <th scope="col">Type</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for person in user_list %}
+                        <tr>
+                            <th scope="row">{{forloop.counter}}</th>
+                            <td>{{person.get_full_name}}</td>
+                            <td>{{person.email}}</td>
+                            <td>{{person.mobile_number}}</td>
+                            <td>{{person.role|title}}</td>
+                            <td>{{person.get_status|title}}</td>
+                            <!-- Action Buttons -->
+                            <td>
+                                <a class="btn btn-sm btn-success" href="/admin/manage-users/{{user.id}}"><i
+                                        class="bi bi-eye-fill"></i></a>
+                                <button class="btn btn-sm btn-primary" record-id="{{person.id}}"
+                                    action="{% if person.is_active %}deactive{% else %}activate{% endif %}"
+                                    onclick="handleActivateDeactivate(this)">
+                                    <i class="bi bi-toggle-{% if person.is_active %}on{% else %}off{% endif %}"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7">
+                                <div class="d-flex justify-content-center">Nothing to show here.<div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+
+                    </tbody>
+                </table>
+
+                {% include 'client/components/paginator.html' %}
+
+            </div>
+        </div>
+    </div>
+
+
+</div>
+<!-- /.container-fluid -->
+<script script src=" {% static 'client/vendor/others/sweetalert.min.js' %}"></script>
+<script script src=" {% static 'client/vendor/others/just-validate.min.js' %}"></script>
+<script>
+    const handleActivateDeactivate = (button) => {
+        const recordID = button.getAttribute('record-id');
+        const action = button.getAttribute('action');
+
+        Swal.fire({
+            title: "Are you sure?",
+            text: `This action will ${action} this user`,
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: `Yes, ${action} it!`
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Make your API call here (e.g., using the fetch() method)
+                const url = `/api/v1/users/${recordID}/activate-or-deactivate`;
+                const payload = {
+                    headers: {
+                        "X-CSRFToken": "{{csrf_token}}"
+                    },
+                    method: 'PATCH',
+                }
+                fetch(url, payload)
+                    .then(response => response.json())
+                    .then(response => {
+                        // reload page to get fresh data
+                        location.reload();
+                    })
+                    .catch(error => {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: 'Something went wrong!',
+                            confirmButtonColor: '#4154f1',
+                        })
+                    });
+            }
+        });
+    };
+</script>
+
+
+{%endblock content%}

@@ -26,16 +26,16 @@
     </div>
 
     <!-- Nav Item - Users -->
-    <li class="nav-item {% if current_page == 'departments' %}active{% endif %}" >
-        <a class="nav-link" href="/admin/departments">
+    <li class="nav-item {% if current_page == 'manage-departments' %}active{% endif %}" >
+        <a class="nav-link" href="/admin/manage-departments">
             <i class="bi bi-house"></i>
             <span>Departments</span>
         </a>
     </li>
 
     <!-- Nav Item - Users -->
-    <li class="nav-item">
-        <a class="nav-link" href="/admin/dashboard">
+    <li class="nav-item {% if current_page == 'manage-users' %}active{% endif %}">
+        <a class="nav-link" href="/admin/manage-users">
             <i class="bi bi-people"></i>
             <span> Users</span>
         </a>

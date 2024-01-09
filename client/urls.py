@@ -21,7 +21,11 @@ urlpatterns = [
     path('admin/dashboard', views.DashboardView.as_view()),
 
     # Department
-    path('admin/departments', views.DepartmentList.as_view()),
+    path('admin/manage-departments', views.DepartmentList.as_view()),
+    
+    # User
+    path('admin/manage-users', views.UserList.as_view()),
+    path('admin/manage-users/create', views.UserCreate.as_view()),
 
     # FAQ
     path('admin/manage-faqs', views.FAQList.as_view()),
