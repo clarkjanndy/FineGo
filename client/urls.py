@@ -9,6 +9,9 @@ urlpatterns = [
     # Auth
     path('login', views.LoginView.as_view()),
     path('register', views.RegistrationView.as_view()),
+    
+    # FAQ
+    path('my-profile', views.UserMyProfile.as_view()),
 
     # FAQ
     path('faq', views.FAQ.as_view()),

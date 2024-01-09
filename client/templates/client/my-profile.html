@@ -1,0 +1,611 @@
+{% extends "client/app.html"%}
+
+{% load static %}
+{% load extra_tags %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+    <!-- Page Heading -->
+    <div>
+        <h1 class="h3 mb-0 text-gray-800">My Profile</h1>
+
+        <div aria-label="breadcrumb">
+            <ol class="breadcrumb" style="background-color: inherit;">
+                <li class="breadcrumb-item active" aria-current="page">My Profile</li>
+            </ol>
+        </div>
+    </div>
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Profile Details</h6>
+        </div>
+        <div class="card-body">
+
+            <!-- Django messages -->
+            {% if messages %}
+            {% for message in messages %}
+            {% include 'client/components/alert.html' %}
+            {% endfor %}
+            {% endif %}
+
+            <div class="row">
+                <div class="col-xl-4">
+
+                    <div class="card">
+                        <div class="card-body profile-card pt-4 d-flex flex-column align-items-center">
+
+                            <!-- <img src="{% if user.photo %}{{user.photo.url}}{% endif %}" alt="Profile"
+                                onerror="this.src='{{user.default_photo_url}}';"> -->
+
+                            <div class="bg-primary rounded-circle d-flex justify-content-center align-items-center text-light"
+                                style="width: 100px; height: 100px; font-size: 40px;">
+                                {{user.get_abbreviated_name}}
+                            </div>
+
+                            <div class="mt-3 text-center">
+                                <h4>{{user.get_full_name}}</h4>
+                                <h4 class="label">{{user.role|title}}</h4>
+                                <svg id="barcode"></svg>
+                            </div>
+
+
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="col-xl-8">
+
+                    <div class="card">
+                        <div class="card-body pt-3">
+
+                            <div class="tab-content pt-2">
+
+                                {% if not user.is_active %}
+                                <div class="alert alert-primary alert-dismissible fade show" role="alert"
+                                    id="generalAlert">
+                                    <small>
+                                        This user is currently deactivated. Would you like to activate this user?
+                                        Click <span style="color: #717ff5; cursor: pointer;"
+                                            id="activate-button">here</span> to activate.
+                                    </small>
+                                </div>
+                                {% endif %}
+
+                                <div class="d-flex justify-content-end">
+                                    <div>
+                                        <button class="btn btn-primary" data-toggle="modal"
+                                            data-target="#updateUserModal">Update Information <i
+                                                class="bi bi-chevron-double-right"></i></button>
+
+                                        <button class="btn btn-primary" data-toggle="modal"
+                                            data-target="#changePasswordModal">Change Password <i
+                                                class="bi bi-key"></i></button>
+                                    </div>
+                                </div>
+
+                                <h5 class="card-title text-primary mt-3">Bio</h5>
+                                <p class="small fst-italic">{{user.bio|default:"No bio"}}</p>
+
+                                <h5 class="card-title text-primary mt-3">Profile Details</h5>
+
+                                <div class="row">
+                                    <div class="col-lg-3 col-md-4 label">Full Name</div>
+                                    <div class="col-lg-9 col-md-8">{{user.get_full_name}}</div>
+                                </div>
+
+                                {% if not user.is_superuser %}
+                                <div class="row">
+                                    <div class="col-lg-3 col-md-4 label ">Student Id</div>
+                                    <div class="col-lg-9 col-md-8">{{user.student_id}}</div>
+                                </div>
+                                {% endif %}
+
+                                <div class="row">
+                                    <div class="col-lg-3 col-md-4 label">Birthday</div>
+                                    <div class="col-lg-9 col-md-8">{{user.birthday|date:'E d, Y'}}</div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-lg-3 col-md-4 label">Gender</div>
+                                    <div class="col-lg-9 col-md-8">{{user.gender|long_gender}}</div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-lg-3 col-md-4 label">Address</div>
+                                    <div class="col-lg-9 col-md-8">{{user.address}}</div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-lg-3 col-md-4 label">Mobile</div>
+                                    <div class="col-lg-9 col-md-8">{{user.mobile_number}}</div>
+                                </div>
+
+                                <h5 class="card-title text-primary mt-3">Account Details</h5>
+
+                                <div class="row">
+                                    <div class="col-lg-3 col-md-4 label">Username</div>
+                                    <div class="col-lg-9 col-md-8">{{user.username}}</div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-lg-3 col-md-4 label">Email</div>
+                                    <div class="col-lg-9 col-md-8">{{user.email}}</div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-lg-3 col-md-4 label">Date Joined</div>
+                                    <div class="col-lg-9 col-md-8">{{user.date_joined|date:'E d, Y'}}</div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-lg-3 col-md-4 label">Last Login</div>
+                                    <div class="col-lg-9 col-md-8">{{user.last_login|date:'E d, Y'}}</div>
+                                </div>
+
+                            </div><!-- End Bordered Tabs -->
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Start Update Profile Modal -->
+    <div class="modal fade" id="updateUserModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Update User</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form id="updateUserForm">
+                    <div class="modal-body">
+                        <!-- <div class="row mb-3">
+                        <label for="profileImage" class="col-md-4 col-lg-3 col-form-label">Profile
+                            Image</label>
+                        <div class="col-md-8 col-lg-9">
+                            <img src="{% if user.photo %}{{user.photo.url}}{% endif %}"
+                                alt="Profile" id="photoPreview"
+                                onerror="this.src='{{user.default_photo_url}}';">
+
+                            <div class="pt-2">
+                                <input type="file" id="photo" name="photo" accept="image/*" hidden>
+                                <label for="photo" class="btn btn-primary btn-sm text-light"><i
+                                        class="bi bi-upload"></i></label>
+                            </div>
+
+                        </div>
+                    </div> -->
+
+                        <div class="row mb-3">
+                            <label for="first_name" class="col-md-4 col-lg-3 col-form-label">First
+                                Name</label>
+                            <div class="col-md-8 col-lg-9">
+                                <input name="first_name" type="text" class="form-control" id="first_name"
+                                    value="{{user.first_name}}">
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <label for="middle_name" class="col-md-4 col-lg-3 col-form-label">Middle
+                                Name</label>
+                            <div class="col-md-8 col-lg-9">
+                                <input name="middle_name" type="text" class="form-control" id="middle_name"
+                                    value="{{user.middle_name}}">
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <label for="last_name" class="col-md-4 col-lg-3 col-form-label">Last
+                                Name</label>
+                            <div class="col-md-8 col-lg-9">
+                                <input name="last_name" type="text" class="form-control" id="last_name"
+                                    value="{{user.last_name}}">
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <label for="suffix" class="col-md-4 col-lg-3 col-form-label">Suffix</label>
+                            <div class="col-md-8 col-lg-9">
+                                <input name="suffix" type="text" class="form-control" id="suffix"
+                                    value="{{user.suffix}}">
+                            </div>
+                        </div>
+
+                        <div class="row mb-3" id="studentIdContainer">
+                            <label for="student_id" class="col-md-4 col-lg-3 col-form-label">Student
+                                Id</label>
+                            <div class="col-md-8 col-lg-9">
+                                <input name="student_id" type="text" class="form-control" id="student_id"
+                                    value="{{user.student_id|default:""}}">
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <label for="birthday" class="col-md-4 col-lg-3 col-form-label">Birthday</label>
+                            <div class="col-md-8 col-lg-9">
+                                <input name="birthday" type="date" class="form-control" id="birthday"
+                                    value="{{user.birthday|date:'Y-m-d'}}">
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <label for="gender" class="col-md-4 col-lg-3 col-form-label">Gender</label>
+                            <div class="col-md-8 col-lg-9">
+                                <select class="form-control" name="gender" id="gender">
+                                    <option selected disabled value="">---</option>
+                                    <option value="M" {{user.gender|is_selected:"M"}}>
+                                        Male</option>
+                                    <option value="F" {{user.gender|is_selected:"F"}}>
+                                        Female</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <label for="address" class="col-md-4 col-lg-3 col-form-label">Address</label>
+                            <div class="col-md-8 col-lg-9">
+                                <input name="address" type="text" class="form-control" id="address"
+                                    value="{{user.address}}">
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <label for="mobile_number" class="col-md-4 col-lg-3 col-form-label">Mobile</label>
+                            <div class="col-md-8 col-lg-9">
+                                <input name="mobile_number" type="text" class="form-control" id="mobile_number"
+                                    value="{{user.mobile_number}}">
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <label for="role" class="col-md-4 col-lg-3 col-form-label">Role</label>
+                            <div class="col-md-8 col-lg-9">
+                                <select class="form-control" name="role" id="role">
+                                    <option selected disabled value="">---</option>
+                                    <option value="admin" {{user.role|is_selected:"admin"}}>
+                                        Administrator</option>
+                                    <option value="student" {{user.role|is_selected:"student"}}>
+                                        Student</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <div class="d-flex justify-content-end">
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                        </div>
+                    </div>
+                </form><!-- End Profile Edit Form -->
+            </div>
+        </div>
+    </div><!-- End Update Profile Modal-->
+
+
+    <!-- Start Change Password Modal -->
+    <div class="modal fade" id="changePasswordModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Change Password</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <!-- Change Password Form -->
+                <form id="changePasswordForm">
+                    <div class="modal-body">
+
+                        <div class="row mb-3">
+                            <label for="current_password" class="col-md-4 col-lg-3 col-form-label">Current
+                                Password</label>
+                            <div class="col-md-8 col-lg-9">
+                                <input name="current_password" type="password" class="form-control"
+                                    id="current_password">
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <label for="password" class="col-md-4 col-lg-3 col-form-label">New Password</label>
+                            <div class="col-md-8 col-lg-9">
+                                <input name="password" type="password" class="form-control" id="password">
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <label for="password1" class="col-md-4 col-lg-3 col-form-label">Re-enter New
+                                Password</label>
+                            <div class="col-md-8 col-lg-9">
+                                <input name="password1" type="password" class="form-control" id="password1">
+                            </div>
+                        </div>
+
+                        <div class="alert alert-primary alert-dismissible fade show" role="alert" id="generalAlert">
+                            <small>You will be logged-out after you change your password.</small>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+
+                        <div class="d-flex justify-content-end">
+                            <button type="submit" class="btn btn-primary">Change Password</button>
+                        </div>
+                    </div>
+                </form><!-- End Change Password Form -->
+            </div>
+        </div>
+    </div><!-- End Change Password Modal-->
+
+
+</div>
+<!-- /.container-fluid -->
+<script script src=" {% static 'client/vendor/others/sweetalert.min.js' %}"></script>
+<script script src=" {% static 'client/vendor/others/just-validate.min.js' %}"></script>
+<script script src=" {% static 'client/vendor/others/barcode.min.js' %}"></script>
+<script>
+    const activateButton = document.getElementById('activate-button');
+    if (activateButton) {
+        activateButton.addEventListener('click', () => {
+            Swal.fire({
+                title: "Are you sure?",
+                text: `This action will activate this user`,
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: `Yes, activate it!`
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Make your API call here (e.g., using the fetch() method)
+                    const url = "/api/v1/users/{{user.id}}/activate-or-deactivate";
+                    const payload = {
+                        headers: {
+                            "X-CSRFToken": "{{csrf_token}}"
+                        },
+                        method: 'PATCH',
+                    }
+                    fetch(url, payload)
+                        .then(response => response.json())
+                        .then(response => {
+                            // reload page to get fresh data
+                            location.reload();
+                        })
+                        .catch(error => {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Oops...',
+                                text: 'Something went wrong!',
+                                confirmButtonColor: '#4154f1',
+                            })
+                        });
+                }
+            });
+        });
+    }
+
+    // validation of forms
+    const updateUserForm = document.getElementById('updateUserForm');
+    const updateUserFormValidator = new window.JustValidate('#updateUserForm', {
+        errorFieldCssClass: 'is-invalid',
+    });
+
+    //track changes on the role dropdown
+    const roleSelect = document.getElementById('role');
+    const studentIdContainer = document.getElementById('studentIdContainer');
+
+    const handleShowStudId = (selectedRole) => {
+        // hide if selected role is admin
+        if (selectedRole == 'admin') {
+            studentIdContainer.classList.add('d-none')
+
+            // remove rules from validator
+            updateUserFormValidator
+                .removeField('#student_id')
+
+            // show if otherwise
+        } else {
+            studentIdContainer.classList.remove('d-none')
+
+            //add rules to validator
+            updateUserFormValidator
+                .addField('#student_id', [{
+                    rule: 'required',
+                    errorMessage: 'This field is required',
+                },])
+        }
+    }
+    handleShowStudId(roleSelect.value)
+
+    roleSelect.addEventListener('change', (evt) => {
+        const selectedRole = roleSelect.value
+        handleShowStudId(selectedRole)
+    })
+
+    updateUserFormValidator
+        .addField('#first_name', [{
+            rule: 'required',
+            errorMessage: 'This field is required',
+        },])
+        .addField('#last_name', [{
+            rule: 'required',
+            errorMessage: 'This field is required',
+        },])
+        .addField('#birthday', [{
+            rule: 'required',
+            errorMessage: 'This field is required',
+        },])
+        .addField('#gender', [{
+            rule: 'required',
+            errorMessage: 'This field is required',
+        },])
+        .addField('#mobile_number', [{
+            rule: 'required',
+            errorMessage: 'This field is required',
+        }, {
+            rule: 'integer',
+            errorMessage: 'Invalid mobile number.',
+        }, {
+            rule: 'maxLength',
+            value: 11,
+            errorMessage: 'Invalid mobile number.'
+        }, {
+            rule: 'minLength',
+            value: 11,
+            errorMessage: 'Invalid mobile number.',
+        }])
+        .addField('#role', [{
+            rule: 'required',
+            errorMessage: 'This field is required',
+        },])
+        .onSuccess((event) => {
+            event.preventDefault();
+
+            // Make your API call here (e.g., using the fetch() method)
+            const url = '/api/v1/users/{{user.id}}';
+            const formData = new FormData(updateUserForm);
+            const payload = {
+                headers: {
+                    "X-CSRFToken": "{{csrf_token}}"
+                },
+                method: 'PATCH',
+                body: formData
+            }
+
+            fetch(url, payload)
+                .then(response => response.json())
+                .then(response => {
+                    console.log(response)
+                    // process success here
+                    if (response.status === 'success') {
+                        const data = response.data
+                        //redirect to user profile
+                        window.location.reload()
+
+                        // process failed here
+                    } else {
+                        // store error data
+                        const errors = response.data
+                        // create a blank variable to store error
+                        const field_errors = {}
+                        // add hashtags to keys
+                        Object.keys(errors).forEach(key => {
+                            const value = errors[key];
+                            field_errors[`#${key}`] = value
+                        });
+                        // show field errors to user
+                        updateUserFormValidator.showErrors(field_errors)
+                    }
+                })
+                .catch(error => {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: 'Something went wrong!',
+                        confirmButtonColor: '#4154f1',
+                    })
+                });
+        });
+
+
+    const changePasswordForm = document.getElementById('changePasswordForm');
+    const changePasswordFormValidator = new window.JustValidate('#changePasswordForm', {
+        errorFieldCssClass: 'is-invalid',
+    });
+    changePasswordFormValidator
+        .addField('#current_password', [{
+            rule: 'required',
+            errorMessage: 'This field is required',
+        },])
+        .addField('#password', [{
+            rule: 'required',
+            errorMessage: 'This field is required',
+        }, {
+            rule: 'password',
+            errorMessage: 'Password must contain at least 8 characters, 1 uppercase, 1 lowercase, 1 number and 1 special case character.',
+        }, {
+            validator: () => {
+                const current_password = document.getElementById('current_password');
+                const password = document.getElementById('password');
+                return current_password.value !== password1.value;
+            },
+            errorMessage: 'New password must not be the same with old password.',
+        }])
+        .addField('#password1', [{
+            rule: 'required',
+            errorMessage: 'This field is required',
+        }, {
+            validator: () => {
+                const password = document.getElementById('password');
+                const password1 = document.getElementById('password1');
+                return password.value === password1.value;
+            },
+            errorMessage: 'Password did not match.',
+        }])
+        .onSuccess((event) => {
+            event.preventDefault();
+
+            // Make your API call here (e.g., using the fetch() method)
+            const url = '/api/v1/change-password';
+            const formData = new FormData(changePasswordForm);
+            const payload = {
+                headers: {
+                    "X-CSRFToken": "{{csrf_token}}"
+                },
+                method: 'PATCH',
+                body: formData
+            }
+
+            fetch(url, payload)
+                .then(response => response.json())
+                .then(response => {
+                    console.log(response)
+                    // process success here
+                    if (response.status === 'success') {
+                        const data = response.data
+                        //reload page
+                        location.reload();
+
+                        // process failed here
+                    } else {
+                        // store error data
+                        const errors = response.data
+                        // create a blank variable to store error
+                        const field_errors = {}
+                        // add hashtags to keys
+                        Object.keys(errors).forEach(key => {
+                            const value = errors[key];
+                            field_errors[`#${key}`] = value
+                        });
+                        // show field errors to user
+                        changePasswordFormValidator.showErrors(field_errors)
+                    }
+                })
+                .catch(error => {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: 'Something went wrong!',
+                        confirmButtonColor: '#4154f1',
+                    })
+                });
+        });
+
+
+    JsBarcode("#barcode", "{{user.student_id|default:'N/A'}}", {
+        height: 50,
+        margin: 0,
+        font: 'Montserrat',
+        fontSize: 15
+    });
+
+</script>
+
+
+{%endblock content%}

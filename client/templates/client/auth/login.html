@@ -43,6 +43,12 @@
                                         <img src="{% static 'client/img/FineGo.png' %}" width="200">
                                         <p>Enter your credentials to login.</p>
                                     </div>
+                                    <!-- Django messages -->
+                                    {% if messages %}
+                                    {% for message in messages %}
+                                    {% include 'client/components/alert.html' %}
+                                    {% endfor %}
+                                    {% endif %}
                                     <form class="user" id="loginForm">
                                         <div class="alert alert-danger alert-dismissible fade show d-none" role="alert"
                                             id="alertContainer">

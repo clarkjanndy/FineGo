@@ -6,7 +6,7 @@ from api.models import Department, User
 
 from . custom_mixins import AdminRequiredMixin, LoginRequiredMixin
 
-__all__ = ['DepartmentList', 'UserList', 'UserCreate', 'UserDetail'] 
+__all__ = ['DepartmentList', 'UserList', 'UserCreate', 'UserDetail', 'UserMyProfile'] 
 
 class DepartmentList(AdminRequiredMixin, ListView):
     template_name = 'client/admin/department/list.html'
