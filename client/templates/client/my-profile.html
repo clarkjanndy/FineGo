@@ -115,6 +115,11 @@
                                 </div>
 
                                 <div class="row">
+                                    <div class="col-lg-3 col-md-4 label">Department</div>
+                                    <div class="col-lg-9 col-md-8">{{user.department.name|default:""}}</div>
+                                </div>
+
+                                <div class="row">
                                     <div class="col-lg-3 col-md-4 label">Address</div>
                                     <div class="col-lg-9 col-md-8">{{user.address}}</div>
                                 </div>
@@ -250,6 +255,18 @@
                         </div>
 
                         <div class="row mb-3">
+                            <label for="gender" class="col-md-4 col-lg-3 col-form-label">Department</label>
+                            <div class="col-md-8 col-lg-9">
+                                <select class="form-control" name="department" id="department">
+                                    <option selected value="">---</option>
+                                    {% for dep in departments %}
+                                    <option value="{{dep.id}}"  {% if user.department.id is dep.id %}selected{% endif %}>{{dep.name}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
                             <label for="address" class="col-md-4 col-lg-3 col-form-label">Address</label>
                             <div class="col-md-8 col-lg-9">
                                 <input name="address" type="text" class="form-control" id="address"
@@ -277,6 +294,14 @@
                                 </select>
                             </div>
                         </div>
+
+                        <div class="row mb-3">
+                            <label for="birthday" class="col-md-4 col-lg-3 col-form-label">Bio</label>
+                            <div class="col-md-8 col-lg-9">
+                                <textarea class="form-control" rows="10" name="bio" id="bio" placeholder="Bio">{{user.bio}}</textarea>
+                            </div>
+                        </div>
+
                     </div>
 
                     <div class="modal-footer">

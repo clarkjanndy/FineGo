@@ -110,6 +110,12 @@
                                 </div>
 
                                 <div class="row">
+                                    <div class="col-lg-3 col-md-4 label">Department</div>
+                                    <div class="col-lg-9 col-md-8">{{person.department.name|default:""}}</div>
+                                </div>
+
+
+                                <div class="row">
                                     <div class="col-lg-3 col-md-4 label">Address</div>
                                     <div class="col-lg-9 col-md-8">{{person.address}}</div>
                                 </div>
@@ -240,6 +246,18 @@
                                         Male</option>
                                     <option value="F" {{person.gender|is_selected:"F"}}>
                                         Female</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <label for="gender" class="col-md-4 col-lg-3 col-form-label">Department</label>
+                            <div class="col-md-8 col-lg-9">
+                                <select class="form-control" name="department" id="department">
+                                    <option selected value="">---</option>
+                                    {% for dep in departments %}
+                                    <option value="{{dep.id}}"  {% if person.department.id is dep.id %}selected{% endif %}>{{dep.name}}</option>
+                                    {% endfor %}
                                 </select>
                             </div>
                         </div>

@@ -29,7 +29,7 @@
 
                 <div class="d-flex justify-content-end mb-4">
                     <a href="/admin/manage-users/create" class="btn btn-primary">
-                        <i class="bi bi-plus-square"></i> Create Users
+                        <i class="bi bi-plus-square"></i> Create User
                     </a>
                 </div>
 
@@ -48,7 +48,7 @@
                             <th scope="col">#</th>
                             <th scope="col">Name</th>
                             <th scope="col">Email</th>
-                            <th scope="col">Mobile</th>
+                            <th scope="col">Department</th>
                             <th scope="col">Type</th>
                             <th scope="col">Status</th>
                             <th scope="col">Actions</th>
@@ -60,7 +60,7 @@
                             <th scope="row">{{forloop.counter}}</th>
                             <td>{{person.get_full_name}}</td>
                             <td>{{person.email}}</td>
-                            <td>{{person.mobile_number}}</td>
+                            <td>{{person.department.name|default:""}}</td>
                             <td>{{person.role|title}}</td>
                             <td>{{person.get_status|title}}</td>
                             <!-- Action Buttons -->

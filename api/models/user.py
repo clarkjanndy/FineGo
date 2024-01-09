@@ -15,6 +15,7 @@ class User(AbstractUser):
         ('F', 'Female')
     )
 
+    department = models.ForeignKey('Department', null=True, blank=True, on_delete=models.CASCADE, related_name='members')
     email = models.EmailField(unique=True)
     role = models.CharField(max_length=15, choices=ROLES, default='student')
     middle_name = models.CharField(max_length=150,  null=True, blank=True)

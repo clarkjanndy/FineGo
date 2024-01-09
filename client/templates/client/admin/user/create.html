@@ -72,7 +72,17 @@
                     </select>
                 </div>
 
-                <div class="col-lg-12 mb-3">
+                <div class="col-lg-6 mb-3">
+                    <label for="gender" class="form-label">Department: </label>
+                    <select class="form-control" name="department" id="department">
+                        <option selected disabled value="">---</option>
+                        {% for dep in departments %}
+                        <option value="{{dep.id}}">{{dep.name}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-lg-6 mb-3">
                     <label for="address" class="form-label">Address: </label>
                     <input type="text" name="address" class="form-control" id="address" required placeholder="Address">
                 </div>
@@ -146,6 +156,11 @@
         // hide if selected role is admin
         if (selectedRole == 'admin') {
             studentIdContainer.classList.add('d-none')
+
+            // remove rules from validator
+            createUserFormValidator
+                .removeField('#student_id')
+
 
             // show if otherwise
         } else {

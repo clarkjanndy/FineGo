@@ -67,7 +67,8 @@ class UserList(AdminRequiredMixin, ListView):
                 Q(email__icontains = params['q']) |
                 Q(first_name__icontains = params['q']) |
                 Q(middle_name__icontains = params['q']) |
-                Q(last_name__icontains = params['q']) 
+                Q(last_name__icontains = params['q']) |
+                Q(department__name__icontains = params['q']) 
             )
         return queryset
 
@@ -77,6 +78,7 @@ class UserCreate(AdminRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update({'current_page': 'manage-users'})
+        context.update({'departments': Department.objects.all()})
         return context
     
 class UserDetail(AdminRequiredMixin, DetailView):
@@ -87,6 +89,7 @@ class UserDetail(AdminRequiredMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update({'current_page': 'manage-users'})
+        context.update({'departments': Department.objects.all()})
         return context
     
 class UserMyProfile(LoginRequiredMixin, TemplateView):
@@ -95,6 +98,8 @@ class UserMyProfile(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update({'current_page': 'my-profile'})
+        context.update({'departments': Department.objects.all()})
+
         return context
 
 
