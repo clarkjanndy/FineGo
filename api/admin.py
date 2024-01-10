@@ -6,7 +6,9 @@ from . models import (
     Department,
     User, 
     FAQ, 
-    SystemInformation
+    SystemInformation,
+    ActivityGroup,
+    Activity
 )
 
 # Register your admin manager here
@@ -32,10 +34,21 @@ class FAQAdmin(admin.ModelAdmin):
 class SystemInformationAdmin(admin.ModelAdmin):
     list_display = ('title', 'content',)
     search_fields = ('title', 'content',)
+    
+class ActivityGroupAdmin(admin.ModelAdmin):
+    list_display = ('name', 'status',)
+    search_fields = ('name', 'status',)
+    
+class ActivityAdmin(admin.ModelAdmin):
+    list_display = ('group', 'name', 'status', 'start_time', 'end_time', 'status')
+    search_fields = ('group__name', 'status',)
 
 # Register your models here.
 admin.site.register(Department, DepartmentAdmin)
 admin.site.register(User, UserAdmin)
 admin.site.register(FAQ, FAQAdmin)
 admin.site.register(SystemInformation, SystemInformationAdmin)
+
+admin.site.register(ActivityGroup, ActivityGroupAdmin)
+admin.site.register(Activity, ActivityAdmin)
 

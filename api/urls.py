@@ -27,5 +27,11 @@ urlpatterns = [
     # System Information
     path('system-informations', views.SystemInformationListCreate.as_view()),
     path('system-informations/<int:pk>', views.SystemInformationById.as_view()),
+    
+    # Activity
+    path('activity-groups', views.ActivityGroupListCreate.as_view()),
+    path('activity-groups/<int:pk>', views.ActivityGroupById.as_view()),
+    path('activity-groups/<int:group>/activities', views.ActivityListCreate.as_view()),
+    path('activity-groups/<int:group>/activities/<int:pk>', views.ActivityById.as_view()),
 
 ]
