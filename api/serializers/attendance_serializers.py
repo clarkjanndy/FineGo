@@ -28,7 +28,7 @@ class AttendanceSerializer(CustomModelSerializer):
         if not request.user in partcipants:
             raise ValidationError({'message': 'You are not a participant of this activity group.'})        
         
-        if not activity.status == 'active':
+        if not activity.status == 'open':
             raise ValidationError({'activity': 'Activity no longer accepts attendance'})
         
         return attrs

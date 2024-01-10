@@ -38,6 +38,7 @@ class Activity(TimeStampedModel):
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
     status = models.CharField(choices=STATUS, max_length=10, default='active')
+    fine_amount = models.DecimalField(decimal_places=2, max_digits=10)
     
     def __str__(self):
         return f"{self.name}"

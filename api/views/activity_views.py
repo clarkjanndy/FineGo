@@ -1,17 +1,17 @@
 from django.contrib import messages
 
-from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView, RetrieveUpdateAPIView
 from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError
 
 from api.serializers import ActivityGroupSerializer, ActivitySerializer
-from api.models import ActivityGroup, Activity
+from api.models import ActivityGroup, Activity, Attendance, Fine
 from api.permissions import IsAdminOrReadOnly
 
 from api.exceptions import SerializerValidationError, ClientError
 
-__all__ = ['ActivityGroupListCreate', 'ActivityGroupById', 'ActivityListCreate', 'ActivityById']
+__all__ = ['ActivityGroupListCreate', 'ActivityGroupById', 'ActivityListCreate', 'ActivityById', 'ActivityClose']
 
 class ActivityGroupListCreate(ListCreateAPIView):
     permission_classes = (IsAdminOrReadOnly, )
@@ -163,3 +163,45 @@ class ActivityById(RetrieveUpdateDestroyAPIView):
                 "message": msg
             }
         })
+        
+class ActivityClose(ActivityById):
+    permission_classes = (IsAdminUser, )
+    allowed_methods = ['POST']
+    
+    def post(self, request, *args, **kwargs):
+        activity = self.get_object()
+        if not activity.status == 'open':
+            messages.error(request, message:='Unable to close activity')
+            raise ClientError({"message": message})
+        
+        activity.status = 'closing'
+        activity.save()
+        message = 'Activity is now closing.'
+        
+        try:
+            participants = activity.group.participants.all()
+            fine_issued = 0
+            
+            for participant in participants:
+                attendance = Attendance.objects.filter(activity=activity, user=participant, time_out__isnull=False).first()
+                if not attendance:
+                    fine = Fine.objects.get_or_create(user=participant, activity=activity, amount=activity.fine_amount)
+                    fine_issued += 1
+                    
+            activity.status = 'closed'
+            message = 'Activity successfully closed.'
+            activity.save()
+        
+        except Exception as err:
+            messages.error(request, message:=f'An error has occured while closing activity. {str(err)}')
+            raise ClientError({"message": message})
+                  
+        return Response({
+            "status": "success", 
+            "data": {
+                "message": message,
+                "fine_issued": fine_issued
+            }
+        })
+    
+    
