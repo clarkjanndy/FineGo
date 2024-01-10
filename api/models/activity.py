@@ -21,6 +21,9 @@ class ActivityGroup(TimeStampedModel):
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='created_activity_group')
     participants = models.ManyToManyField(User, default=default_participants , related_name='activity_groups')
     
+    def __str__(self):
+        return f"{self.name}"
+    
 class Activity(TimeStampedModel):
     
     STATUS = (
@@ -35,3 +38,10 @@ class Activity(TimeStampedModel):
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
     status = models.CharField(choices=STATUS, max_length=10, default='active')
+    
+    def __str__(self):
+        return f"{self.name}"
+    
+    class Meta:
+        verbose_name_plural = 'activities'
+    

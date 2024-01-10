@@ -33,5 +33,8 @@ urlpatterns = [
     path('activity-groups/<int:pk>', views.ActivityGroupById.as_view()),
     path('activity-groups/<int:group>/activities', views.ActivityListCreate.as_view()),
     path('activity-groups/<int:group>/activities/<int:pk>', views.ActivityById.as_view()),
+    
+    # attendance
+    path('attendance', views.AttendanceCreate.as_view()),
 
 ]

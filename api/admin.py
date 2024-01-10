@@ -8,7 +8,8 @@ from . models import (
     FAQ, 
     SystemInformation,
     ActivityGroup,
-    Activity
+    Activity,
+    Attendance
 )
 
 # Register your admin manager here
@@ -42,6 +43,10 @@ class ActivityGroupAdmin(admin.ModelAdmin):
 class ActivityAdmin(admin.ModelAdmin):
     list_display = ('group', 'name', 'status', 'start_time', 'end_time', 'status')
     search_fields = ('group__name', 'status',)
+    
+class AttendanceAdmin(admin.ModelAdmin):
+    list_display = ('activity', 'user',  'time_in', 'time_out')
+    search_fields = ('activity', 'user',  'time_in', 'time_out')
 
 # Register your models here.
 admin.site.register(Department, DepartmentAdmin)
@@ -51,4 +56,5 @@ admin.site.register(SystemInformation, SystemInformationAdmin)
 
 admin.site.register(ActivityGroup, ActivityGroupAdmin)
 admin.site.register(Activity, ActivityAdmin)
+admin.site.register(Attendance, AttendanceAdmin)
 
