@@ -6,7 +6,7 @@ from api.models import Department, User
 
 from . custom_mixins import AdminRequiredMixin, LoginRequiredMixin
 
-__all__ = ['DepartmentList', 'UserList', 'UserCreate', 'UserDetail', 'UserMyProfile'] 
+__all__ = ['DepartmentList', 'UserList', 'UserCreate', 'UserDetail', 'UserMyProfile', 'UserBarcode'] 
 
 class DepartmentList(AdminRequiredMixin, ListView):
     template_name = 'client/admin/department/list.html'
@@ -102,6 +102,14 @@ class UserMyProfile(LoginRequiredMixin, TemplateView):
 
         return context
 
+class UserBarcode(LoginRequiredMixin, TemplateView):
+    template_name = 'client/my-barcode.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({'current_page': 'my-barcode'})
+
+        return context
 
 
 
