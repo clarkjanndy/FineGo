@@ -11,7 +11,7 @@ from api.permissions import IsAdminOrReadOnly
 
 from api.exceptions import SerializerValidationError, ClientError
 
-__all__ = ['ActivityGroupListCreate', 'ActivityGroupById', 'ActivityListCreate', 'ActivityById', 'ActivityClose']
+__all__ = ['ActivityGroupListCreate', 'ActivityGroupById', 'ActivityListCreate', 'ActivityById', 'ActivityClose', 'ActivityOpen']
 
 class ActivityGroupListCreate(ListCreateAPIView):
     permission_classes = (IsAdminOrReadOnly, )
@@ -202,6 +202,28 @@ class ActivityClose(ActivityById):
             "data": {
                 "message": message,
                 "fine_issued": fine_issued
+            }
+        })
+        
+class ActivityOpen(ActivityById):
+    permission_classes = (IsAdminUser, )
+    allowed_methods = ['POST']
+    
+    def post(self, request, *args, **kwargs):
+        activity = self.get_object()
+        if not activity.status == 'active':
+            messages.error(request, message:='Unable to open activity')
+            raise ClientError({"message": message})
+        
+        activity.status = 'open'
+        activity.save()
+        message = 'Activity is now open for attendance to come in.'
+        
+        messages.success(request, message)     
+        return Response({
+            "status": "success", 
+            "data": {
+                "message": message,
             }
         })
     

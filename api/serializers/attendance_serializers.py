@@ -3,21 +3,33 @@ from rest_framework.exceptions import ValidationError
 from rest_framework import serializers
 
 from . extras import CustomModelSerializer
-from api.models import Attendance
+from api.models import Attendance, User
 
 __all__ = ['AttendanceSerializer']
 
+class StudentIdRelatedField(serializers.RelatedField):
+    def to_representation(self, value):
+        return getattr(value, 'student_id')
+    
+    def to_internal_value(self, value):
+        # Convert serialized data back into a related User object
+        try:
+            return User.objects.get(student_id=value)
+        except (ValueError, User.DoesNotExist):
+            raise serializers.ValidationError("Invalid Student ID")
+
 class AttendanceSerializer(CustomModelSerializer):
     ACTIONS = (
-        ('time_in', 'Time-In'),
-        ('time_out', 'Time-Out')
+        ('time-in', 'Time-In'),
+        ('time-out', 'Time-Out')
     )
     action = serializers.ChoiceField(choices=ACTIONS, write_only=True)
+    user = StudentIdRelatedField(queryset=User.objects.filter(is_superuser=False))
     
     class Meta:
         model = Attendance
         fields = '__all__'   
-        read_only_fields = ('user', 'time_in', 'time_out'); 
+        read_only_fields = ('time_in', 'time_out'); 
         
     def validate(self, attrs):
         request = self.context.get('request')

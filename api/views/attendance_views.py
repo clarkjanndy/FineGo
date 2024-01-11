@@ -20,22 +20,23 @@ class AttendanceCreate(CreateAPIView):
 
     def post(self, request, *args, **kwargs):
         data = request.data
-        user = request.user
         
         serializer = self.serializer_class(data=data, context={"request": request})
         serializer.is_valid()
         validated_data = serializer.validated_data
+        activity = validated_data['activity']
+        user = validated_data['user'] 
         
-        if validated_data['action'] == 'time_in':
-            attendance, created = Attendance.objects.get_or_create(activity=validated_data['activity'], user=user )
+        if validated_data['action'] == 'time-in':
+            attendance, created = Attendance.objects.get_or_create(activity=activity, user=user )
             if not created:
                 message = 'You already Time-In.'
                 raise ClientError({'message': message})
             
-            message = 'Time-In success.'
+            message = f'Time-In success for <b>{user.get_full_name}</b>'
            
         else:
-            attendance =  Attendance.objects.filter(activity=validated_data['activity'], user=user).first()
+            attendance =  Attendance.objects.filter(activity=activity, user=user).first()
             if not attendance:
                 message = 'Unable to time-out'
                 raise ClientError({'message': message})
@@ -46,7 +47,7 @@ class AttendanceCreate(CreateAPIView):
              
             attendance.time_out = timezone.now()
             attendance.save()
-            message = 'Time-Out success.'
+            message = f'Time-Out success for <b>{user.get_full_name}</b>'
           
         data = self.serializer_class(attendance).data
         data['message'] = message

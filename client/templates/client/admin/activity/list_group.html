@@ -1,0 +1,385 @@
+{% extends "client/app.html"%}
+
+{% load static %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+    <!-- Page Heading -->
+    <div>
+        <h1 class="h3 mb-0 text-gray-800">Manage Activities</h1>
+
+        <div aria-label="breadcrumb">
+            <ol class="breadcrumb" style="background-color: inherit;">
+                <li class="breadcrumb-item active" aria-current="page">Manage Activities</li>
+                <li class="breadcrumb-item">Activity Group</li>
+            </ol>
+        </div>
+    </div>
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">List of Activity Group</h6>
+        </div>
+        <div class="card-body">
+
+
+            <div class="table-responsive">
+
+                <div class="d-flex justify-content-end mb-4">
+                    <button type="button" class="btn btn-primary" data-toggle="modal"
+                        data-target="#createActivityGroupModal">
+                        <i class="bi bi-plus-square"></i> Create Activity Group
+                    </button>
+                </div>
+
+                {% include 'client/components/table_search.html' %}
+
+                <!-- Django messages -->
+                {% if messages %}
+                {% for message in messages %}
+                {% include 'client/components/alert.html' %}
+                {% endfor %}
+                {% endif %}
+
+                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Name</th>
+                            <th scope="col">Created By</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for group in activitygroup_list %}
+                        <tr>
+                            <th scope="row">{{forloop.counter}}</th>
+                            <td>{{group.name}}</td>
+                            <td>{{group.created_by.get_full_name}}</td>
+                            <td>{{group.get_status_display}}</td>
+                            <!-- Action Buttons -->
+                            <td class="w-25">
+                                <a class="btn btn-sm btn-success" href="/admin/manage-activities/groups/{{group.id}}"><i
+                                        class="bi bi-eye-fill"></i></a>
+
+                                <button record-id="{{group.id}}" type="button" class="btn btn-primary btn-sm"
+                                    data-toggle="modal" data-target="#updateActivityGroupModal">
+                                    <i class="bi bi-pencil-square"></i>
+                                </button>
+
+                                <!-- <button class="btn btn-sm btn-danger" record-id="{{group.id}}"
+                                    onclick="handleDelete(this)"><i class="bi bi-trash"></i></button> -->
+
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5">
+                                <div class="d-flex justify-content-center">Nothing to show here.<div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+
+                    </tbody>
+                </table>
+
+                {% include 'client/components/paginator.html' %}
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Activity Group Modal -->
+    <div class="modal fade" id="createActivityGroupModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Create Activity Group</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form id="createActivityGroupForm">
+                    <div class="modal-body">
+
+                        <div class="col-lg-12 mb-3">
+                            <label for="name" class="form-label">Name: </label>
+                            <input type="text" name="name" class="form-control" id="name" placeholder="Name">
+                        </div>
+
+                        <div class="col-lg-12 mb-3">
+                            <label for="status" class="form-label">Status: </label>
+                            <select class="form-control" name="status" id="status">
+                                <option selected disabled value="">---</option>
+                                <option value="active">Active</option>
+                                <option value="inactive">Inctive</option>
+                            </select>
+                        </div>
+
+                        <div class="col-lg-12">
+                            <label for="description" class="form-label">Description: </label>
+                            <textarea name="description" class="form-control" id="description" rows="12"
+                                placeholder="Description"></textarea>
+                        </div>
+
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Save</button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div><!-- End Create Activity Group Modal-->
+
+    <!-- Update Activity Group Modal -->
+    <div class="modal fade" id="updateActivityGroupModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Create Activity Group</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form id="updateActivityGroupForm">
+                    <div class="modal-body">
+
+                        <div class="col-lg-12 mb-3">
+                            <label for="name" class="form-label">Name: </label>
+                            <input type="text" name="name" class="form-control" id="name" placeholder="Name">
+                        </div>
+
+                        <div class="col-lg-12 mb-3">
+                            <label for="status" class="form-label">Status: </label>
+                            <select class="form-control" name="status" id="status">
+                                <option selected disabled value="">---</option>
+                                <option value="active">Active</option>
+                                <option value="inactive">Inctive</option>
+                            </select>
+                        </div>
+
+                        <div class="col-lg-12">
+                            <label for="description" class="form-label">Description: </label>
+                            <textarea name="description" class="form-control" id="description" rows="12"
+                                placeholder="Description"></textarea>
+                        </div>
+
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Save</button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div><!-- End Update Activity Group Modal-->
+
+
+</div>
+<!-- /.container-fluid -->
+<script script src=" {% static 'client/vendor/others/sweetalert.min.js' %}"></script>
+<script script src=" {% static 'client/vendor/others/just-validate.min.js' %}"></script>
+<script>
+    //form validator for create FAQ
+    const createActivityGroupForm = document.getElementById('createActivityGroupForm');
+    const createActivityGroupFormValidator = new window.JustValidate('#createActivityGroupForm', {
+        errorFieldCssClass: 'is-invalid',
+    });
+
+    createActivityGroupFormValidator
+        .addField('#name', [{
+            rule: 'required',
+            errorMessage: 'This field is required',
+        },])
+        .addField('#status', [{
+            rule: 'required',
+            errorMessage: 'This field is required',
+        },])
+        .onSuccess((event) => {
+            event.preventDefault();
+            form = event.target
+            // Make your API call here (e.g., using the fetch() method)
+            const url = '/api/v1/activity-groups';
+            const formData = new FormData(form);
+            const payload = {
+                headers: {
+                    "X-CSRFToken": "{{csrf_token}}",
+                    "Content-Type": 'application/json'
+                },
+                method: 'POST',
+                body: JSON.stringify({
+                    name: formData.get('name'),
+                    status: formData.get('status'),
+                    description: formData.get('description')
+                })
+            }
+            fetch(url, payload)
+                .then(response => response.json())
+                .then(response => {
+                    console.log(response)
+                    // process success here
+                    if (response.status === 'success') {
+                        //redirect to user profile
+                        location.reload()
+                    }
+                })
+                .catch(error => {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: err,
+                        confirmButtonColor: '#4154f1',
+                    })
+                });
+        })
+
+    const handleUpdateModal = () => {
+        $('#updateActivityGroupModal').on('show.bs.modal', (event) => {
+            // Button that triggered the modal
+            const button = event.relatedTarget;
+            // Extract info from data-bs-* attributes
+            const recordID = button.getAttribute('record-id');
+            // Make your API call here (e.g., using the fetch() method)
+            const url = `/api/v1/activity-groups/${recordID}`;
+            const payload = {
+                headers: {
+                    "X-CSRFToken": "{{csrf_token}}"
+                },
+                method: 'GET',
+            }
+            fetch(url, payload)
+                .then(response => response.json())
+                .then(response => {
+                    // Update the modal's content.
+                    const form = updateActivityGroupModal.querySelector('#updateActivityGroupForm');
+                    const name = form.querySelector('#name');
+                    const status = form.querySelector('#status');
+                    const description = form.querySelector('#description');
+                    data = response.data
+
+                    form.setAttribute('record-id', data.id);
+                    name.value = data.name
+                    status.value = data.status
+                    description.value = data.description
+                })
+                .catch(error => {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: error,
+                        confirmButtonColor: '#4154f1',
+                    })
+                });
+        })
+    };
+    handleUpdateModal();
+
+
+    //form validator for update FAQ
+    const updateActivityGroupForm = document.getElementById('updateActivityGroupForm');
+    const updateActivityGroupFormValidator = new window.JustValidate('#updateActivityGroupForm', {
+        errorFieldCssClass: 'is-invalid',
+    });
+
+    updateActivityGroupFormValidator
+        .addField('#name', [{
+            rule: 'required',
+            errorMessage: 'This field is required',
+        },])
+        .addField('#status', [{
+            rule: 'required',
+            errorMessage: 'This field is required',
+        },])
+        .onSuccess((event) => {
+            event.preventDefault();
+            // Make your API call here (e.g., using the fetch() method)
+            form = event.target
+            recordID = form.getAttribute('record-id');
+
+            // create the payload data
+            const url = `/api/v1/activity-groups/${recordID}`;
+            const formData = new FormData(form);
+            const payload = {
+                headers: {
+                    "X-CSRFToken": "{{csrf_token}}",
+                    "Content-Type": 'application/json'
+                },
+                method: 'PATCH',
+                body: JSON.stringify({
+                    name: formData.get('name'),
+                    status: formData.get('status'),
+                    description: formData.get('description')
+                })
+            }
+            fetch(url, payload)
+                .then(response => response.json())
+                .then(response => {
+                    console.log(response)
+                    // process success here
+                    if (response.status === 'success') {
+                        //redirect to user profile
+                        location.reload()
+                    }
+                })
+                .catch(error => {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: 'Something went wrong!',
+                        confirmButtonColor: '#4154f1',
+                    })
+                });
+        })
+
+    const handleDelete = (button) => {
+        const recordID = button.getAttribute('record-id');
+
+        Swal.fire({
+            title: "Are you sure?",
+            text: "You won't be able to revert this! All activity will also be deleted",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, delete it!"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Make your API call here (e.g., using the fetch() method)
+                const url = `/api/v1/activity-groups/${recordID}`;
+                const payload = {
+                    headers: {
+                        "X-CSRFToken": "{{csrf_token}}"
+                    },
+                    method: 'DELETE',
+                }
+                fetch(url, payload)
+                    .then(response => response.json())
+                    .then(response => {
+                        // reload page to get fresh data
+                        location.reload();
+                    })
+                    .catch(error => {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: 'Something went wrong!',
+                            confirmButtonColor: '#4154f1',
+                        })
+                    });
+            }
+        });
+    };
+
+
+
+</script>
+
+
+{%endblock content%}

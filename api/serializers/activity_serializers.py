@@ -9,6 +9,7 @@ class ActivityGroupSerializer(CustomModelSerializer):
     class Meta:
         model = ActivityGroup
         fields = '__all__'
+        read_only_fields = ('created_by', )
         
     def create(self, validated_data):
         request = self.context.get('request')
@@ -26,7 +27,7 @@ class ActivitySerializer(CustomModelSerializer):
         
         if start_time and end_time:
             if start_time > end_time:
-                raise ValidationError({'start_date': 'Must be earlier than ending date.'})
+                raise ValidationError({'start_time': 'Must be earlier than ending date.'})
             
         return attrs
     
