@@ -24,8 +24,8 @@
 
     const qrcode = new QRCode(document.getElementById("qr_code"), {
         text: "{{user.student_id|default:'N/A'}}",
-        width: 200,
-        height: 200,
+        width: 300,
+        height: 300,
         correctLevel: QRCode.CorrectLevel.H,
         background: '#D7E2EF'
     });

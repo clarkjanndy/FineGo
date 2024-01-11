@@ -21,7 +21,7 @@ class AdminRequiredMixin(UserPassesTestMixin):
         request = self.request
         # redirect to login if not authenticated
         if request.user.is_authenticated:
-            return  HttpResponseRedirect('/profile')
+            return  HttpResponseRedirect('/my-profile')
         
         return  HttpResponseRedirect('/login')
         

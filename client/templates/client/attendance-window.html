@@ -148,6 +148,7 @@
                         if (data.hasOwnProperty('activity')) { displayMessage(message, data.activity, 'error'); }
                     }
                     textField.value = ''
+                    textField.focus()
                 })
                 .catch(error => {
                     Swal.fire({
