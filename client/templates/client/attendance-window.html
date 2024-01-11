@@ -148,6 +148,7 @@
                         data = response.data
                         if (data.hasOwnProperty('message')) { displayMessage(message, data.message, 'error'); return }
                         if (data.hasOwnProperty('user')) { displayMessage(message, data.user, 'error'); return }
+                        if (data.hasOwnProperty('activity')) { displayMessage(message, data.activity, 'error'); return }
                     }
                 })
                 .catch(error => {

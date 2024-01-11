@@ -24,8 +24,7 @@ class ActivityGroup(TimeStampedModel):
     def __str__(self):
         return f"{self.name}"
     
-class Activity(TimeStampedModel):
-    
+class Activity(TimeStampedModel):    
     STATUS = (
         ('draft', 'Draft'),
         ('active', 'Active'),
@@ -33,15 +32,39 @@ class Activity(TimeStampedModel):
         ('closing', 'Closing'),
         ('closed', 'Closed')
     )
+    ALLOWED_ACTION = (
+        ('time-in', 'Time-In'),
+        ('time-out', 'Time-Out')
+    )
     group = models.ForeignKey(ActivityGroup, on_delete=models.CASCADE, related_name='activities')
     name = models.CharField(max_length=255)
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
     status = models.CharField(choices=STATUS, max_length=10, default='active')
     fine_amount = models.DecimalField(decimal_places=2, max_digits=10)
+    allowed_action = models.CharField(choices=ALLOWED_ACTION, null=True, blank=True, max_length=10)
     
     def __str__(self):
         return f"{self.name}"
+    
+    @property
+    def status_color(self):
+        MAP = {
+            'draft': 'secondary',
+            'active': 'primary',
+            'open': 'success',
+            'closing': 'warning',
+            'closed': 'danger'            
+        }
+        return MAP.get(self.status, 'secondary')
+    
+    @property
+    def is_openable(self):
+        return self.status in ['active', 'closed']
+    
+    @property
+    def is_closable(self):
+        return self.status in ['open', 'closing']
     
     class Meta:
         verbose_name_plural = 'activities'

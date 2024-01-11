@@ -55,13 +55,25 @@
                         </div>
                         <div class="card-body">
                             <h4 class="card-title">{{activity.name}}</h4>
-                            <div class="d-flex justify-content-end">
-                                <div class="badge badge-secondary"><b>{{activity.status}}</b></div>
+                            <div class="d-flex justify-content-end mb-3">
+                                <div>
+                                    {% if activity.allowed_action %}
+                                    <div class="badge badge-secondary">accepting {{activity.allowed_action}}</div>
+                                    {% endif %}
+                                    <div class="badge badge-{{activity.status_color}}">{{activity.status}}</div>
+                                </div>
                             </div>
 
-                            <div>
-                                <div>Start Time: <b>{{activity.start_time}}</b></div>
-                                <div>End Time: <b>{{activity.end_time}}</b></div>
+                            <div class="mb-3">
+                                <div class="row">
+                                    <div class="col-lg-4 col-md-4 label">Start Time</div>
+                                    <div class="col-lg-8 col-md-8">{{activity.start_time}}</div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-lg-4 col-md-4 label">End Time</div>
+                                    <div class="col-lg-8 col-md-8">{{activity.end_time}}</div>
+                                </div>
                             </div>
 
                             <div class="d-flex justify-content-end">
@@ -71,11 +83,26 @@
                                         <i class="bi bi-pencil-square"></i>
                                     </button>
 
-                                    <button class="btn btn-primary" target="_blank" onclick="handleOpenActivity(this)"
-                                        {% if activity.status == 'active' %}{% else %}disabled{%endif %}
+                                    {% if activity.is_openable %}
+                                    <button class="btn btn-success" onclick="handleOpenActivity(this)"
                                         record-id="{{activity.id}}">
-                                        <i class="bi bi-rocket-takeoff"></i>
+                                        <i class="bi bi-skip-start"></i>
                                     </button>
+                                    {% endif %}
+
+                                    {% if activity.is_closable %}
+                                    <button class="btn btn-danger"  onclick="handleCloseActivity(this)"
+                                        record-id="{{activity.id}}">
+                                        <i class="bi bi-stop-circle"></i>
+                                    </button>
+                                    {% endif %}
+
+                                    {% if activity.is_closable %}
+                                    <button class="btn btn-secondary" data-toggle="modal" data-target="#updateAllowedActionModal""
+                                        record-id="{{activity.id}}">
+                                        <i class="bi bi-file-earmark"></i>
+                                    </button>
+                                    {% endif %}
                                 </div>
 
                             </div>
@@ -201,6 +228,38 @@
                                     able to attend this activity</i></small>
                         </div>
 
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Save</button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div><!-- End Update Activity  Modal-->
+
+    <!-- Update Activity Group Modal -->
+    <div class="modal fade" id="updateAllowedActionModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title text-primary"><div style="font-weight: bold;" id="activity-name">Day 1</div></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form id="updateAllowedActionForm">
+                    
+                    <div class="modal-body">
+                        <div class="col-lg-12 mb-3">
+                            <label>Allowed Action</label>
+                            <select class="form-control" name="allowed_action" id="allowed_action">
+                                <option value="time-in">Time-In</option>
+                                <option value="time-out">Time-Out</option>
+                            </select>
+                        </div>
                     </div>
 
                     <div class="modal-footer">
@@ -414,23 +473,163 @@
         })
 
     const handleOpenActivity = async (button) => {
-        recordID = button.getAttribute('record-id')
-        const url = `/api/v1/activity-groups/{{group.id}}/activities/${recordID}/open`
-        const payload = {
-            headers: {
-                "X-CSRFToken": "{{csrf_token}}"
-            },
-            method: 'POST'
-        }
-        response = await fetch(url, payload)
-        json = await response.json()
-        console.log(json)
-       
-        if (json.status === 'success') {
-            window.open(`/attendance-window/${recordID}`)
-            window.location.reload()
-        }
+        Swal.fire({
+            title: "Are you sure?",
+            text: 'This action will open the activity for attendance, and redirect you to a new window',
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: 'Yes'
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                recordID = button.getAttribute('record-id')
+                const url = `/api/v1/activity-groups/{{group.id}}/activities/${recordID}/open`
+                const payload = {
+                    headers: {
+                        "X-CSRFToken": "{{csrf_token}}"
+                    },
+                    method: 'POST'
+                }
+                response = await fetch(url, payload)
+                json = await response.json()
+                console.log(json)
+
+                if (json.status === 'success') {
+                    window.open(`/attendance-window/${recordID}`)
+                    window.location.reload()
+                } else {
+                    window.location.reload()
+                }
+            }
+        })
+
     }
+
+    const handleCloseActivity = async (button) => {
+        Swal.fire({
+            title: "Are you sure?",
+            text: 'This action will close this activity and issue fines to user who did not attend',
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: 'Yes'
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                recordID = button.getAttribute('record-id')
+                const url = `/api/v1/activity-groups/{{group.id}}/activities/${recordID}/close`
+                const payload = {
+                    headers: {
+                        "X-CSRFToken": "{{csrf_token}}"
+                    },
+                    method: 'POST'
+                }
+                response = await fetch(url, payload)
+                json = await response.json()
+                console.log(json)
+                window.location.reload()
+            }
+        })
+    }
+
+    const handleUpdateAllowedActionModal = () => {
+        $('#updateAllowedActionModal').on('show.bs.modal', (event) => {
+            // Button that triggered the modal
+            const button = event.relatedTarget;
+            // Extract info from data-bs-* attributes
+            const recordID = button.getAttribute('record-id');
+            // Make your API call here (e.g., using the fetch() method)
+            const url = `/api/v1/activity-groups/{{group.id}}/activities/${recordID}`;
+            const payload = {
+                headers: {
+                    "X-CSRFToken": "{{csrf_token}}"
+                },
+                method: 'GET',
+            }
+            fetch(url, payload)
+                .then(response => response.json())
+                .then(response => {
+                    // Update the modal's content.
+                    const form = updateAllowedActionModal.querySelector('#updateAllowedActionForm');
+                    const activity_name = updateAllowedActionModal.querySelector('#activity-name');
+                    const allowed_action = form.querySelector('#allowed_action');
+                   
+                    data = response.data
+
+                    form.setAttribute('record-id', data.id);
+                    allowed_action.value = data.allowed_action
+                    activity_name.innerText = data.name
+                })
+                .catch(error => {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: error,
+                        confirmButtonColor: '#4154f1',
+                    })
+                });
+        })
+    };
+    handleUpdateAllowedActionModal();
+
+    //form validator for update FAQ
+    const updateAllowedActionForm = document.getElementById('updateAllowedActionForm');
+    const updateAllowedActionFormValidator = new window.JustValidate('#updateAllowedActionForm', {
+        errorFieldCssClass: 'is-invalid',
+    });
+
+    updateAllowedActionFormValidator
+        .addField('#allowed_action', [{
+            rule: 'required',
+            errorMessage: 'This field is required',
+        },])
+        .onSuccess((event) => {
+            event.preventDefault();
+            // Make your API call here (e.g., using the fetch() method)
+            form = event.target
+            recordID = form.getAttribute('record-id');
+
+            // create the payload data
+            const url = `/api/v1/activity-groups/{{group.id}}/activities/${recordID}`;
+            const formData = new FormData(form);
+            const payload = {
+                headers: {
+                    "X-CSRFToken": "{{csrf_token}}"
+                },
+                method: 'PATCH',
+                body: formData
+            }
+            fetch(url, payload)
+                .then(response => response.json())
+                .then(response => {
+                    console.log(response)
+                    // process success here
+                    if (response.status === 'success') {
+                        //redirect to user profile
+                        location.reload()
+                        // process failed here
+                    } else {
+                        // store error data
+                        const errors = response.data
+                        // create a blank variable to store error
+                        const field_errors = {}
+                        // add hashtags to keys
+                        Object.keys(errors).forEach(key => {
+                            const value = errors[key];
+                            field_errors[`#${key}`] = value
+                        });
+                        // show field errors to user
+                        updateAllowedActionFormValidator.showErrors(field_errors)
+                    }
+                })
+                .catch(error => {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: error,
+                        confirmButtonColor: '#4154f1',
+                    })
+                });
+        })
 
 </script>
 

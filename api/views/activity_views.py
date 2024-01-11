@@ -170,11 +170,12 @@ class ActivityClose(ActivityById):
     
     def post(self, request, *args, **kwargs):
         activity = self.get_object()
-        if not activity.status == 'open':
+        if not activity.is_closable:
             messages.error(request, message:='Unable to close activity')
             raise ClientError({"message": message})
         
         activity.status = 'closing'
+        activity.allowed_action = None
         activity.save()
         message = 'Activity is now closing.'
         
@@ -196,7 +197,8 @@ class ActivityClose(ActivityById):
         except Exception as err:
             messages.error(request, message:=f'An error has occured while closing activity. {str(err)}')
             raise ClientError({"message": message})
-                  
+        
+        messages.success(request, message)          
         return Response({
             "status": "success", 
             "data": {
@@ -211,11 +213,12 @@ class ActivityOpen(ActivityById):
     
     def post(self, request, *args, **kwargs):
         activity = self.get_object()
-        if not activity.status == 'active':
+        if not activity.is_openable:
             messages.error(request, message:='Unable to open activity')
             raise ClientError({"message": message})
         
         activity.status = 'open'
+        activity.allowed_action = 'time-in'
         activity.save()
         message = 'Activity is now open for attendance to come in.'
         

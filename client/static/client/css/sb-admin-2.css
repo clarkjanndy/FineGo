@@ -58,6 +58,15 @@ article, aside, figcaption, figure, footer, header, hgroup, main, nav, section {
   display: block;
 }
 
+@keyframes fadeIn {
+  from {
+      opacity: 0.9;
+  }
+  to {
+      opacity: 1;
+  }
+}
+
 body {
   margin: 0;
   font-family: "Nunito", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
@@ -9802,6 +9811,7 @@ a:focus {
   background-color: #f8f9fc;
   width: 100%;
   overflow-x: hidden;
+  animation:  fadeIn 0.5s ease-in-out;
 }
 
 #wrapper #content-wrapper #content {
@@ -11301,4 +11311,5 @@ body.sidebar-toggled footer.sticky-footer {
   font-weight: bold;
   color: rgba(1, 41, 112, 0.6);
 }
-  
+
+
