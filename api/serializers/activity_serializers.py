@@ -2,6 +2,7 @@ from . extras import CustomModelSerializer
 from api.models import ActivityGroup, Activity, User
 
 from rest_framework.exceptions import ValidationError
+from rest_framework import serializers
 
 __all__ = ['ActivityGroupSerializer', 'ActivitySerializer']
 
@@ -19,7 +20,15 @@ class ActivityGroupSerializer(CustomModelSerializer):
         return super().create(validated_data)
         
 class ActivitySerializer(CustomModelSerializer):
+    is_openable = serializers.SerializerMethodField()
+    is_closable = serializers.SerializerMethodField()
     
+    def get_is_openable(self, instance):
+        return instance.is_openable
+    
+    def get_is_closable(self, instance):
+        return instance.is_closable
+
     def validate(self, attrs):
         attrs = super().validate(attrs)
         start_time = attrs.get('start_time')

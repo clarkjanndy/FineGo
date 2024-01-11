@@ -383,7 +383,11 @@
                     status.value = data.status
                     fine_amount.value = data.fine_amount
 
-                    console.log(data.start_time)
+                    if (data.is_closable){
+                        status.disabled = true
+                    }else{
+                        status.disabled = false
+                    }
                 })
                 .catch(error => {
                     Swal.fire({
