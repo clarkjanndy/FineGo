@@ -1,0 +1,36 @@
+{% extends "client/app_plain.html"%}
+
+{% load static %}
+{% load extra_tags %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+    <div class="d-flex justify-content-center align-items-center mt-5">
+        <div class="text-center">
+            <div class="bg-primary p-2 mb-5">
+                <img src="{% static 'client/img/FineGo-no-bg.png' %}" width="250">
+            </div>
+
+            <h4>{{user.get_full_name}}</h4>
+            <div id="qr_code" class="d-flex justify-content-center mt-5"></div>
+        </div>
+    </div>
+</div>
+
+<script script src=" {% static 'client/vendor/others/qr.min.js' %}"></script>
+<script>
+
+    const qrcode = new QRCode(document.getElementById("qr_code"), {
+        text: "{{user.student_id|default:'N/A'}}",
+        width: 200,
+        height: 200,
+        correctLevel: QRCode.CorrectLevel.H,
+        background: '#D7E2EF'
+    });
+
+</script>
+
+
+{%endblock content%}

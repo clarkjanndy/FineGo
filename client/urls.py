@@ -12,7 +12,7 @@ urlpatterns = [
     
     # FAQ
     path('my-profile', views.UserMyProfile.as_view()),
-    path('my-barcode', views.UserBarcode.as_view()),
+    path('my-qr', views.UserQRCode.as_view()),
     
     
     # Attendance

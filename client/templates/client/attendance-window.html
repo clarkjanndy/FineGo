@@ -17,12 +17,10 @@
             </div>
 
             <form id="attendanceForm" class="bg-light p-5" method="POST">
-                <div class="mb-3 text-center">
+                
+                <div class="mb-3 text-center">                    
+                    <h2>{{activity.get_allowed_action_display}}</h2>
                     <h3 style="font-weight: bold;">{{activity.group.name}} - {{activity.name}}</h3>
-                    <div>
-                        <div class="text-primary">Attendance Window</div>
-                        <div>Please Enter your ID No</div>
-                    </div>
                 </div>
 
                 <div class="mb-3 text-center">
@@ -50,15 +48,16 @@
                 </div>
 
 
-                <div class="form-group">
+                <!-- <div class="form-group">
                     <select class="form-control" name="action" id="action">
                         <option value="time-in">Time-In</option>
                         <option value="time-out">Time-Out</option>
                     </select>
                     <div class="is-invalid"></div>
-                </div>
+                </div> -->
 
                 <div class="form-group">
+                    <div class="text-center mb-3">Please Enter your ID No</div>
                     <input type="text" name="user" id="user" placeholder="ID No." class="form-control">
                     <div class="is-invalid"></div>
                 </div>
@@ -77,6 +76,7 @@
 <script script src=" {% static 'client/vendor/others/just-validate.min.js' %}"></script>
 <script>
     message = document.getElementById('message')
+    textField = document.getElementById('user')
 
     const displayClock = () => {
         const display = new Date().toLocaleTimeString();
@@ -116,10 +116,6 @@
             rule: 'required',
             errorMessage: 'This field is required',
         },])
-        .addField('#action', [{
-            rule: 'required',
-            errorMessage: 'This field is required',
-        },])
         .onSuccess((event) => {
             event.preventDefault();
             form = event.target
@@ -127,6 +123,7 @@
             const url = '/api/v1/attendance';
             const formData = new FormData(form);
             formData.append('activity', '{{activity.id}}')
+            formData.append('action', '{{activity.allowed_action}}')
             const payload = {
                 headers: {
                     "X-CSRFToken": "{{csrf_token}}"
@@ -146,10 +143,11 @@
 
                     } else {
                         data = response.data
-                        if (data.hasOwnProperty('message')) { displayMessage(message, data.message, 'error'); return }
-                        if (data.hasOwnProperty('user')) { displayMessage(message, data.user, 'error'); return }
-                        if (data.hasOwnProperty('activity')) { displayMessage(message, data.activity, 'error'); return }
+                        if (data.hasOwnProperty('message')) { displayMessage(message, data.message, 'error'); }
+                        if (data.hasOwnProperty('user')) { displayMessage(message, data.user, 'error');  }
+                        if (data.hasOwnProperty('activity')) { displayMessage(message, data.activity, 'error'); }
                     }
+                    textField.value = ''
                 })
                 .catch(error => {
                     Swal.fire({
