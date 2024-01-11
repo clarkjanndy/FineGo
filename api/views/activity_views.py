@@ -185,8 +185,9 @@ class ActivityClose(ActivityById):
             for participant in participants:
                 attendance = Attendance.objects.filter(activity=activity, user=participant, time_out__isnull=False).first()
                 if not attendance:
-                    fine = Fine.objects.get_or_create(user=participant, activity=activity, amount=activity.fine_amount)
-                    fine_issued += 1
+                    fine, created = Fine.objects.get_or_create(user=participant, activity=activity, amount=activity.fine_amount)
+                    if created:
+                        fine_issued += 1
                     
             activity.status = 'closed'
             message = 'Activity successfully closed.'
