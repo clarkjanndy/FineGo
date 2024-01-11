@@ -1,0 +1,97 @@
+{% extends "client/app.html"%}
+
+{% load static %}
+{% load extra_tags %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+    <!-- Page Heading -->
+    <div>
+        <h1 class="h3 mb-0 text-gray-800">On-Going Activities</h1>
+
+        <div aria-label="breadcrumb">
+            <ol class="breadcrumb" style="background-color: inherit;">
+                <li class="breadcrumb-item active" aria-current="page">On-Going Activities</li>
+            </ol>
+        </div>
+    </div>
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">List of On Going Activities</h6>
+        </div>
+        <div class="card-body">
+
+            {% include 'client/components/table_search.html' %}
+            <!-- Django messages -->
+            {% if messages %}
+            {% for message in messages %}
+            {% include 'client/components/alert.html' %}
+            {% endfor %}
+            {% endif %}
+            <div class="row mb-4">
+                {% for activity in activity_list %}
+                <div class="col-lg-4 col-md-4 mb-4">
+                    <div class="card shadow">
+                        <div class="d-flex align-items-center justify-content-center bg-primary" style="height: 150px;">
+                            <i class="bi bi-activity text-light" style="font-size: 100px;"></i>
+                        </div>
+                        <div class="card-body">
+                            <h4 class="card-title">{{activity.name}}</h4>
+                            <h6 class="card-title">{{activity.group.name}}</h6>
+                            <div class="d-flex justify-content-end mb-3">
+                                <div>
+                                    {% if activity.allowed_action %}
+                                    <div class="badge badge-secondary">accepting {{activity.allowed_action}}</div>
+                                    {% endif %}
+                                    <div class="badge badge-{{activity.status_color}}">{{activity.status}}</div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <div class="row">
+                                    <div class="col-lg-4 col-md-4 label">Start Time</div>
+                                    <div class="col-lg-8 col-md-8">{{activity.start_time}}</div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-lg-4 col-md-4 label">End Time</div>
+                                    <div class="col-lg-8 col-md-8">{{activity.end_time}}</div>
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-end">
+                                <div>
+                                    {% if activity.is_closable %}
+                                    <a class="btn btn-success"  href="/attendance-window/{{activity.id}}" target="_blank"
+                                        record-id="{{activity.id}}">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    {% endif %}
+
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-12">
+                    <div class="alert alert-info fade show" role="alert">
+                        No Activities Found.
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% include 'client/components/paginator.html' %}
+        </div>
+    </div>
+
+    
+</div>
+<!-- /.container-fluid -->
+
+{%endblock content%}

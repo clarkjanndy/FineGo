@@ -130,7 +130,8 @@ class ActivityById(RetrieveUpdateDestroyAPIView):
             if not group:
                 raise ValidationError({'group': 'Invalid group'})
             
-            instance = self.get_object()
+            instance = self.get_object()        
+            
             serializer = self.serializer_class(instance, data = request.data, partial=True)
             serializer.is_valid()
             serializer.save(group=group)            

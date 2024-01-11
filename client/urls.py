@@ -14,8 +14,8 @@ urlpatterns = [
     path('my-profile', views.UserMyProfile.as_view()),
     path('my-qr', views.UserQRCode.as_view()),
     
-    
     # Attendance
+    path('on-going-activities', views.ActivityOnGoing.as_view()),
     path('attendance-window/<int:pk>', views.AttendanceWindow.as_view()),
 
     # FAQ

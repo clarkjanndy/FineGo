@@ -9,6 +9,7 @@
     <!-- Divider -->
     <hr class="sidebar-divider my-0">
 
+    {% if user.is_superuser %}
     <!-- Nav Item - Dashboard -->
     <li class="nav-item {% if current_page == 'admin-dashboard' %}active{% endif %}">
         <a class="nav-link" href="/admin/dashboard">
@@ -26,7 +27,7 @@
     </div>
 
     <!-- Nav Item - Users -->
-    <li class="nav-item {% if current_page == 'manage-departments' %}active{% endif %}" >
+    <li class="nav-item {% if current_page == 'manage-departments' %}active{% endif %}">
         <a class="nav-link" href="/admin/manage-departments">
             <i class="bi bi-house"></i>
             <span>Departments</span>
@@ -41,14 +42,17 @@
         </a>
     </li>
 
-     <!-- Divider -->
-     <hr class="sidebar-divider">
+    {% endif %}
 
-     <!-- Heading -->
-     <div class="sidebar-heading">
-         Activities
-     </div>
+    <!-- Divider -->
+    <hr class="sidebar-divider">
 
+    <!-- Heading -->
+    <div class="sidebar-heading">
+        Activities
+    </div>
+
+    {% if user.is_superuser %}
     <!-- Nav Item - Manage Activities -->
     <li class="nav-item  {% if current_page == 'manage-activities' %}active{% endif %}">
         <a class="nav-link" href="/admin/manage-activities">
@@ -56,16 +60,17 @@
             <span> Manage Activities</span>
         </a>
     </li>
+    {% endif %}
 
     <!-- Nav Item - Manage Activities -->
-    <li class="nav-item">
-        <a class="nav-link" href="/admin/dashboard">
-            <i class="bi bi-calendar-event"></i>
-            <span> On-going Events</span>
+    <li class="nav-item {% if current_page == 'on-going-activities' %}active{% endif %}"">
+        <a class=" nav-link" href="/on-going-activities">
+        <i class="bi bi-calendar-event"></i>
+        <span> On-going Activities</span>
         </a>
     </li>
 
-      <!-- Divider -->
+    <!-- Divider -->
     <hr class="sidebar-divider">
 
     <!-- Heading -->
@@ -73,6 +78,14 @@
         Others
     </div>
 
+    <li class="nav-item {% if current_page == 'my-fines' %}active{% endif %}">
+        <a class="nav-link" href="/my-fines">
+            <i class="bi bi-question-square"></i>
+            <span>My Fines</span>
+        </a>
+    </li>
+
+    {% if user.is_superuser %}
     <!-- Nav Item - FAQs-->
     <li class="nav-item {% if current_page == 'manage-faqs' %}active{% endif %}">
         <a class="nav-link" href="/admin/manage-faqs">
@@ -80,7 +93,7 @@
             <span>Manage FAQs</span>
         </a>
     </li>
-    
+
 
     <!-- Nav Item - Settings -->
     <li class="nav-item {% if current_page == 'manage-system-informations' %}active{% endif %}">
@@ -89,6 +102,7 @@
             <span>System Informations</span>
         </a>
     </li>
+    {% endif %}
 
     <!-- Divider -->
     <hr class="sidebar-divider">
@@ -102,14 +116,14 @@
         </a>
     </li>
 
-     <!-- Nav Item - Settings -->
-     <li class="nav-item {% if current_page == 'faq' %}active{% endif %}">
+    <!-- Nav Item - Settings -->
+    <li class="nav-item {% if current_page == 'faq' %}active{% endif %}">
         <a class="nav-link" href="/faq">
             <i class="bi bi-question"></i>
             <span>FAQs</span>
         </a>
     </li>
-    
+
 
     <!-- Sidebar Toggler (Sidebar) -->
     <!-- <div class="text-center d-none d-md-inline">
