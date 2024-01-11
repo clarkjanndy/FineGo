@@ -13,6 +13,7 @@ urlpatterns = [
     # FAQ
     path('my-profile', views.UserMyProfile.as_view()),
     path('my-qr', views.UserQRCode.as_view()),
+    path('my-fines', views.UserFines.as_view()),
     
     # Attendance
     path('on-going-activities', views.ActivityOnGoing.as_view()),

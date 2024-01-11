@@ -1,0 +1,80 @@
+{% extends "client/app.html"%}
+
+{% load static %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+    <!-- Page Heading -->
+    <div>
+        <h1 class="h3 mb-0 text-gray-800">My Fines</h1>
+
+        <div aria-label="breadcrumb">
+            <ol class="breadcrumb" style="background-color: inherit;">
+                <li class="breadcrumb-item active" aria-current="page">My Fines</li>
+            </ol>
+        </div>
+    </div>
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">List of Fines</h6>
+        </div>
+        <div class="card-body">
+
+
+            <div class="table-responsive">
+
+                {% include 'client/components/table_search.html' %}
+
+                <!-- Django messages -->
+                {% if messages %}
+                {% for message in messages %}
+                {% include 'client/components/alert.html' %}
+                {% endfor %}
+                {% endif %}
+
+                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Activity Group</th>
+                            <th scope="col">Activity</th>
+                            <th scope="col">Amount</th>
+                            <th scope="col">Created At</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for fine in fine_list %}
+                        <tr>
+                            <th scope="row">{{forloop.counter}}</th>
+                            <td>{{fine.activity.group}}</td>
+                            <td>{{fine.activity}}</td>
+                            <td>&#8369; {{fine.amount}}</td>
+                            <td>{{fine.created_at}}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5">
+                                <div class="d-flex justify-content-center">Nothing to show here.<div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+
+                    </tbody>
+                </table>
+
+                {% include 'client/components/paginator.html' %}
+
+            </div>
+        </div>
+    </div>
+
+    
+
+
+</div>
+
+
+{%endblock content%}
