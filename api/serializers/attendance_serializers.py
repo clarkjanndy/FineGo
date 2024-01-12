@@ -32,12 +32,12 @@ class AttendanceSerializer(CustomModelSerializer):
         read_only_fields = ('time_in', 'time_out'); 
         
     def validate(self, attrs):
-        request = self.context.get('request')
         attrs = super().validate(attrs)
         activity = attrs.get('activity')
+        user = attrs.get('user')
         partcipants = activity.group.participants.all()
         
-        if not request.user in partcipants:
+        if not user in partcipants:
             raise ValidationError({'message': 'You are not a participant of this activity group.'})        
         
         if not activity.status == 'open':
