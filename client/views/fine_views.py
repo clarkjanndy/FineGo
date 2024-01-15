@@ -21,10 +21,11 @@ class UserFines(LoginRequiredMixin, ListView):
     def get_queryset(self):
         # Get current request
         request = self.request
-        queryset = super().get_queryset().filter(user=request.user)
+        queryset = super().get_queryset()
+        queryset = queryset.filter(user = request.user)
+        
         # Get query params
         params = request.GET
-        
 
         # Get the desired page size from the request's GET parameter
         page_size = params.get('page_size', self.paginate_by)
