@@ -1,0 +1,347 @@
+{% extends "client/app.html"%}
+
+{% load static %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+    <!-- Page Heading -->
+    <div>
+        <h1 class="h3 mb-0 text-gray-800">Manage Fines</h1>
+
+        <div aria-label="breadcrumb">
+            <ol class="breadcrumb" style="background-color: inherit;">
+                <li class="breadcrumb-item active" aria-current="page">Manage Fines</li>
+                <li class="breadcrumb-item active" aria-current="page"></li>
+            </ol>
+        </div>
+    </div>
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">List of Fines </h6>
+        </div>
+        <div class="card-body">
+            <!-- <div class="d-flex justify-content-end mb-4">
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#createFaqModal">
+                    <i class="bi bi-plus-square"></i> Add FAQ
+                </button>
+            </div> -->
+
+            <div class="table-responsive">
+                {% include 'client/components/table_search.html' %}
+
+                <!-- Django messages -->
+                {% if messages %}
+                {% for message in messages %}
+                {% include 'client/components/alert.html' %}
+                {% endfor %}
+                {% endif %}
+
+                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">User</th>
+                            <th scope="col">Activity</th>
+                            <th scope="col">Amount</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Date Created</th>
+                            <th scope="col">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for fine in fine_list %}
+                        <tr>
+                            <th scope="row">{{forloop.counter}}</th>
+                            <td>{{fine.user.get_full_name}}</td>                            
+                            <td><b>{{fine.activity.group.name}}</b> - {{fine.activity}}</td>
+                            <td>{{fine.amount}}</td>        
+                            <td>{{fine.get_status_display}}</td>               
+                            <td>{{fine.created_at|date:"M d, Y"}}</td>
+                            <!-- Action Buttons -->
+                            <td>
+                                <button record-id="{{faq.id}}" type="button" class="btn btn-primary btn-sm"
+                                    data-toggle="modal" data-target="#updateFaqModal">
+                                    <i class="bi bi-pencil-square"></i>
+                                </button>
+                                <button class="btn btn-sm btn-danger" record-id="{{faq.id}}"
+                                    onclick="handleDelete(this)"><i class="bi bi-trash"></i></button>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7">
+                                <div class="d-flex justify-content-center">Nothing to show here.<div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+
+                    </tbody>
+                </table>
+
+                {% include 'client/components/paginator.html' %}
+                
+            </div>
+        </div>
+    </div>
+
+    <!-- Create FAQ Modal -->
+    <div class="modal fade" id="createFaqModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add FAQ</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form id="createFaqForm">
+                    <div class="modal-body">
+
+                        <div class="col-lg-12 mb-3">
+                            <label for="question" class="form-label">Question: </label>
+                            <input type="text" name="question" class="form-control" id="question"
+                                placeholder="Question">
+                        </div>
+
+                        <div class="col-lg-12">
+                            <label for="answer" class="form-label">Answer: </label>
+                            <textarea name="answer" class="form-control" id="answer" rows="12"
+                                placeholder="Answer"></textarea>
+                        </div>
+
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Save</button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div><!-- End Create FAQ Modal-->
+
+    <!-- Update FAQ Modal -->
+    <div class="modal fade" id="updateFaqModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Update FAQ</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form id="updateFaqForm">
+                    <div class="modal-body">
+
+                        <div class="col-lg-12 mb-3">
+                            <label for="question" class="form-label">Question: </label>
+                            <input type="text" name="question" class="form-control" id="question"
+                                placeholder="Question">
+                        </div>
+
+                        <div class="col-lg-12">
+                            <label for="answer" class="form-label">Answer: </label>
+                            <textarea name="answer" class="form-control" id="answer" rows="12"
+                                placeholder="Answer"></textarea>
+                        </div>
+
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Save</button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div><!-- End Update FAQ Modal-->
+
+</div>
+<!-- /.container-fluid -->
+<script script src=" {% static 'client/vendor/others/sweetalert.min.js' %}"></script>
+<script script src=" {% static 'client/vendor/others/just-validate.min.js' %}"></script>
+<script>
+    //form validator for create FAQ
+    const createFaqForm = document.getElementById('createFaqForm');
+    const createFaqFormValidator = new window.JustValidate('#createFaqForm', {
+        errorFieldCssClass: 'is-invalid',
+    });
+
+    createFaqFormValidator
+        .addField('#question', [{
+            rule: 'required',
+            errorMessage: 'This field is required',
+        },])
+        .addField('#answer', [{
+            rule: 'required',
+            errorMessage: 'This field is required',
+        },])
+        .onSuccess((event) => {
+            event.preventDefault();
+            form = event.target
+            // Make your API call here (e.g., using the fetch() method)
+            const url = '/api/v1/faqs';
+            const formData = new FormData(form);
+            const payload = {
+                headers: {
+                    "X-CSRFToken": "{{csrf_token}}"
+                },
+                method: 'POST',
+                body: formData
+            }
+            fetch(url, payload)
+                .then(response => response.json())
+                .then(response => {
+                    console.log(response)
+                    // process success here
+                    if (response.status === 'success') {
+                        //redirect to user profile
+                        location.reload()
+                    }
+                })
+                .catch(error => {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: 'Something went wrong!',
+                        confirmButtonColor: '#4154f1',
+                    })
+                });
+        })
+
+    const handleUpdateModal = () => {
+        $('#updateFaqModal').on('show.bs.modal', (event) => {
+            // Button that triggered the modal
+            const button = event.relatedTarget;
+            // Extract info from data-bs-* attributes
+            const recordID = button.getAttribute('record-id');
+            // Make your API call here (e.g., using the fetch() method)
+            const url = `/api/v1/faqs/${recordID}`;
+            const payload = {
+                headers: {
+                    "X-CSRFToken": "{{csrf_token}}"
+                },
+                method: 'GET',
+            }
+            fetch(url, payload)
+                .then(response => response.json())
+                .then(response => {
+                    // Update the modal's content.
+                    const form = updateFaqModal.querySelector('#updateFaqForm');
+                    const question = updateFaqModal.querySelector('#question');
+                    const answer = updateFaqModal.querySelector('#answer');
+                    data = response.data
+
+                    form.setAttribute('record-id', data.id);
+                    question.value = data.question
+                    answer.value = data.answer
+                })
+                .catch(error => {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: 'Something went wrong!',
+                        confirmButtonColor: '#4154f1',
+                    })
+                });
+        })
+    };
+    handleUpdateModal();
+
+    //form validator for update FAQ
+    const updateFaqForm = document.getElementById('updateFaqForm');
+    const updateFaqFormValidator = new window.JustValidate('#updateFaqForm', {
+    errorFieldCssClass: 'is-invalid',
+    });
+
+    updateFaqFormValidator
+        .addField('#question', [{
+            rule: 'required',
+            errorMessage: 'This field is required',
+        },])
+        .addField('#answer', [{
+            rule: 'required',
+            errorMessage: 'This field is required',
+        },])
+        .onSuccess((event) => {
+            event.preventDefault();
+            // Make your API call here (e.g., using the fetch() method)
+            form = event.target
+            recordID = form.getAttribute('record-id');
+
+            // create the payload data
+            const url = `/api/v1/faqs/${recordID}`; 
+            const formData = new FormData(form);
+            const payload =  {
+                headers: {
+                "X-CSRFToken":  "{{csrf_token}}"
+                },
+                method: 'PATCH',
+                body: formData
+            }
+            fetch(url, payload)
+                .then(response => response.json())
+                .then(response => {
+                    console.log(response)
+                    // process success here
+                    if (response.status === 'success'){
+                    //redirect to user profile
+                    location.reload()
+                    }
+                })
+                .catch(error => {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: 'Something went wrong!',
+                        confirmButtonColor: '#4154f1',
+                    })
+                });
+        })
+
+    const handleDelete = (button) => {
+        const recordID = button.getAttribute('record-id');
+
+        Swal.fire({
+            title: "Are you sure?",
+            text: "You won't be able to revert this!",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, delete it!"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Make your API call here (e.g., using the fetch() method)
+                const url = `/api/v1/faqs/${recordID}`;
+                const payload = {
+                    headers: {
+                        "X-CSRFToken": "{{csrf_token}}"
+                    },
+                    method: 'DELETE',
+                }
+                fetch(url, payload)
+                    .then(response => response.json())
+                    .then(response => {
+                        // reload page to get fresh data
+                        location.reload();
+                    })
+                    .catch(error => {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: 'Something went wrong!',
+                            confirmButtonColor: '#4154f1',
+                        })
+                    });
+            }
+        });
+    };
+</script>
+
+
+{%endblock content%}

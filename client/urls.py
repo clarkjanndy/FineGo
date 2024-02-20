@@ -43,6 +43,9 @@ urlpatterns = [
     # System Information
     path('admin/manage-system-informations', views.SystemInformationList.as_view()),
     
+    #Fines
+    path('admin/manage-fines', views.FineList.as_view()),    
+    
     # Manage Activities
     path('admin/manage-activities', RedirectView.as_view(url='/admin/manage-activities/groups', permanent=False)),
     path('admin/manage-activities/groups', views.ActivityGroupList.as_view()),

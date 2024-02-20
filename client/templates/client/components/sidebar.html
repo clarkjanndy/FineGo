@@ -73,6 +73,21 @@
     <!-- Divider -->
     <hr class="sidebar-divider">
 
+    {% if user.is_superuser %}
+     <!-- Heading -->
+     <div class="sidebar-heading">
+        Fines
+    </div>
+
+    <!-- Nav Item - Manage Activities -->
+    <li class="nav-item  {% if current_page == 'manage-fines' %}active{% endif %}">
+        <a class="nav-link" href="/admin/manage-fines">
+            <i class="bi bi-file-earmark-text"></i>
+            <span> Manage Fines </span>
+        </a>
+    </li>
+    {% endif %}
+
     <!-- Heading -->
     <div class="sidebar-heading">
         Others
@@ -80,7 +95,7 @@
 
     <li class="nav-item {% if current_page == 'my-fines' %}active{% endif %}">
         <a class="nav-link" href="/my-fines">
-            <i class="bi bi-question-square"></i>
+            <i class="bi bi-file-earmark-text-fill"></i>
             <span>My Fines</span>
         </a>
     </li>
