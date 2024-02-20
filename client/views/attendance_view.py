@@ -5,11 +5,11 @@ from django.views.generic import ListView, TemplateView, DetailView
 
 from api.models import  Activity
 
-from . custom_mixins import LoginRequiredMixin
+from . custom_mixins import LoginRequiredMixin, AdminRequiredMixin
 
 __all__ = ['AttendanceWindow',] 
     
-class AttendanceWindow(LoginRequiredMixin, DetailView): 
+class AttendanceWindow(AdminRequiredMixin, DetailView): 
     model = Activity
     template_name = 'client/attendance-window.html'
     context_object_name = 'activity'

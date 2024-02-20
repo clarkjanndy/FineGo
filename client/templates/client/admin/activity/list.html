@@ -80,19 +80,25 @@
                                 <div>
                                     <button record-id="{{activity.id}}" type="button" class="btn btn-primary"
                                         data-toggle="modal" data-target="#updateActivityModal">
-                                        <i class="bi bi-pencil-square"></i>
+                                        <div
+                                        data-toggle="tooltip" data-placement="bottom" title="Edit activity">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </div>
+                                       
                                     </button>
 
                                     {% if activity.is_openable %}
                                     <button class="btn btn-success" onclick="handleOpenActivity(this)"
-                                        record-id="{{activity.id}}">
+                                        record-id="{{activity.id}}"
+                                        data-toggle="tooltip" data-placement="bottom" title="Open activity">
                                         <i class="bi bi-skip-start"></i>
                                     </button>
                                     {% endif %}
 
                                     {% if activity.is_closable %}
                                     <button class="btn btn-danger"  onclick="handleCloseActivity(this)"
-                                        record-id="{{activity.id}}">
+                                        record-id="{{activity.id}}"
+                                        data-toggle="tooltip" data-placement="bottom" title="Close activity">
                                         <i class="bi bi-stop-circle"></i>
                                     </button>
                                     {% endif %}
@@ -100,7 +106,10 @@
                                     {% if activity.is_closable %}
                                     <button class="btn btn-secondary" data-toggle="modal" data-target="#updateAllowedActionModal""
                                         record-id="{{activity.id}}">
-                                        <i class="bi bi-file-earmark"></i>
+                                        <div
+                                        data-toggle="tooltip" data-placement="bottom" title="Edit Allowed Action">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </div>
                                     </button>
                                     {% endif %}
                                 </div>
@@ -276,6 +285,12 @@
 <!-- /.container-fluid -->
 <script script src=" {% static 'client/vendor/others/sweetalert.min.js' %}"></script>
 <script script src=" {% static 'client/vendor/others/just-validate.min.js' %}"></script>
+<script>
+     $(function () {
+        $('[data-toggle="tooltip"]').tooltip()
+    })
+</script>
+
 <script>
     //form validator for create FAQ
     const createActivityForm = document.getElementById('createActivityForm');
