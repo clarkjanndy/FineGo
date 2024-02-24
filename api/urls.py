@@ -36,7 +36,10 @@ urlpatterns = [
     path('activity-groups/<int:group>/activities/<int:pk>/close', views.ActivityClose.as_view()),
     path('activity-groups/<int:group>/activities/<int:pk>/open', views.ActivityOpen.as_view()),
     
-    # attendance
+    # Attendance
     path('attendance', views.AttendanceCreate.as_view()),
+    
+    # Fine
+    path('fines/<int:pk>', views.FineById.as_view()),
 
 ]

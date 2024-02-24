@@ -10,6 +10,7 @@ class Fine(TimeStampedModel):
     STATUS = (
         ('paid', 'Paid'),
         ('unpaid', 'Unpaid'),
+        ('removed', 'Removed')
     )
     
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='fines')
