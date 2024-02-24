@@ -1,6 +1,7 @@
 from django.db import models
-from . extras import TimeStampedModel
+from django.db.models import Count
 
+from . extras import TimeStampedModel
 from . user import User
 
 __all__ = ['ActivityGroup', 'Activity']
@@ -44,6 +45,9 @@ class Activity(TimeStampedModel):
     fine_amount = models.DecimalField(decimal_places=2, max_digits=10)
     allowed_action = models.CharField(choices=ALLOWED_ACTION, null=True, blank=True, max_length=10)
     
+    class Meta:
+        verbose_name_plural = 'activities'
+    
     def __str__(self):
         return f"{self.name}"
     
@@ -65,7 +69,14 @@ class Activity(TimeStampedModel):
     @property
     def is_closable(self):
         return self.status in ['open', 'closing']
+        
+    @property
+    def get_num_attendee_incomplete(self):
+        count = self.attendance.filter(time_out__isnull=True).aggregate(count=Count('pk'))['count']
+        return count
     
-    class Meta:
-        verbose_name_plural = 'activities'
+    @property
+    def get_num_attendee_complete(self):
+        count = self.attendance.filter(time_in__isnull=False, time_out__isnull=False).aggregate(count=Count('pk'))['count']
+        return count
     

@@ -50,6 +50,7 @@ urlpatterns = [
     path('admin/manage-activities', RedirectView.as_view(url='/admin/manage-activities/groups', permanent=False)),
     path('admin/manage-activities/groups', views.ActivityGroupList.as_view()),
     path('admin/manage-activities/groups/<int:group>', views.ActivityList.as_view()),
+     path('admin/manage-activities/groups/<int:group>/activities/<int:pk>', views.ActivityDetails.as_view()),
     
    
     

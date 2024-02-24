@@ -50,6 +50,11 @@
                 {% for activity in activity_list %}
                 <div class="col-lg-4 col-md-4 mb-4">
                     <div class="card shadow">
+                        <div class="bg bg-primary  p-2 d-flex align-items-center justify-content-end">
+                            <a data-toggle="tooltip" data-placement="right" title="View Activty Details" class="text-white" href="/admin/manage-activities/groups/1/activities/1">
+                                <i class="bi bi-arrow-up-right-square" style="font-size: 30px;"></i>
+                            </a>
+                        </div>
                         <div class="d-flex align-items-center justify-content-center bg-primary" style="height: 150px;">
                             <i class="bi bi-activity text-light" style="font-size: 100px;"></i>
                         </div>
@@ -80,34 +85,33 @@
                                 <div>
                                     <button record-id="{{activity.id}}" type="button" class="btn btn-primary"
                                         data-toggle="modal" data-target="#updateActivityModal">
-                                        <div
-                                        data-toggle="tooltip" data-placement="bottom" title="Edit activity">
+                                        <div data-toggle="tooltip" data-placement="bottom" title="Edit activity">
                                             <i class="bi bi-pencil-square"></i>
                                         </div>
-                                       
+
                                     </button>
 
                                     {% if activity.is_openable %}
                                     <button class="btn btn-success" onclick="handleOpenActivity(this)"
-                                        record-id="{{activity.id}}"
-                                        data-toggle="tooltip" data-placement="bottom" title="Open activity">
+                                        record-id="{{activity.id}}" data-toggle="tooltip" data-placement="bottom"
+                                        title="Open activity">
                                         <i class="bi bi-skip-start"></i>
                                     </button>
                                     {% endif %}
 
                                     {% if activity.is_closable %}
-                                    <button class="btn btn-danger"  onclick="handleCloseActivity(this)"
-                                        record-id="{{activity.id}}"
-                                        data-toggle="tooltip" data-placement="bottom" title="Close activity">
+                                    <button class="btn btn-danger" onclick="handleCloseActivity(this)"
+                                        record-id="{{activity.id}}" data-toggle="tooltip" data-placement="bottom"
+                                        title="Close activity">
                                         <i class="bi bi-stop-circle"></i>
                                     </button>
                                     {% endif %}
 
                                     {% if activity.is_closable %}
-                                    <button class="btn btn-secondary" data-toggle="modal" data-target="#updateAllowedActionModal""
-                                        record-id="{{activity.id}}">
-                                        <div
-                                        data-toggle="tooltip" data-placement="bottom" title="Edit Allowed Action">
+                                    <button class="btn btn-secondary" data-toggle="modal"
+                                        data-target="#updateAllowedActionModal""
+                                        record-id=" {{activity.id}}">
+                                        <div data-toggle="tooltip" data-placement="bottom" title="Edit Allowed Action">
                                             <i class="bi bi-pencil-square"></i>
                                         </div>
                                     </button>
@@ -254,13 +258,15 @@
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title text-primary"><div style="font-weight: bold;" id="activity-name">Day 1</div></h5>
+                    <h5 class="modal-title text-primary">
+                        <div style="font-weight: bold;" id="activity-name">Day 1</div>
+                    </h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <form id="updateAllowedActionForm">
-                    
+
                     <div class="modal-body">
                         <div class="col-lg-12 mb-3">
                             <label>Allowed Action</label>
@@ -286,7 +292,7 @@
 <script script src=" {% static 'client/vendor/others/sweetalert.min.js' %}"></script>
 <script script src=" {% static 'client/vendor/others/just-validate.min.js' %}"></script>
 <script>
-     $(function () {
+    $(function () {
         $('[data-toggle="tooltip"]').tooltip()
     })
 </script>
@@ -398,9 +404,9 @@
                     status.value = data.status
                     fine_amount.value = data.fine_amount
 
-                    if (data.is_closable){
+                    if (data.is_closable) {
                         status.disabled = true
-                    }else{
+                    } else {
                         status.disabled = false
                     }
                 })
@@ -571,7 +577,7 @@
                     const form = updateAllowedActionModal.querySelector('#updateAllowedActionForm');
                     const activity_name = updateAllowedActionModal.querySelector('#activity-name');
                     const allowed_action = form.querySelector('#allowed_action');
-                   
+
                     data = response.data
 
                     form.setAttribute('record-id', data.id);

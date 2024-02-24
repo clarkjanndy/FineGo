@@ -1,11 +1,14 @@
 from django.db.models import Q
-from django.views.generic import ListView
+from django.db.models.base import Model as Model
+from django.views.generic import ListView, DetailView
+from django.core.paginator import Paginator
+from django.http import Http404
 
-from api.models import ActivityGroup, Activity
+from api.models import ActivityGroup, Activity, Attendance
 
 from . custom_mixins import AdminRequiredMixin, LoginRequiredMixin
 
-__all__ = ['ActivityGroupList', 'ActivityList', 'ActivityOnGoing'] 
+__all__ = ['ActivityGroupList', 'ActivityList', 'ActivityDetails', 'ActivityOnGoing'] 
 
 class ActivityGroupList(AdminRequiredMixin, ListView):
     template_name = 'client/admin/activity/list_group.html'
@@ -71,6 +74,45 @@ class ActivityList(AdminRequiredMixin, ListView):
                 Q(end_time__icontains = params['q'])
             )
         return queryset
+    
+class ActivityDetails(AdminRequiredMixin, DetailView):
+    template_name = 'client/admin/activity/detail.html'
+    queryset = Activity.objects.select_related('group')
+    context_object_name = 'activity'
+    
+    def get_queryset(self):
+        # filter based on group        
+        queryset = super().get_queryset().filter(group = self.kwargs['group'])
+        return queryset
+        
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        request = self.request
+        params = request.GET
+        
+        # pagination context data
+        page_size = params.get('page_size', 10)
+        page = params.get('page', 1)
+        attedances = Attendance.objects.filter(activity=self.kwargs['pk']).order_by('created_at')
+         # Filter results
+        if 'q' in params:
+            attedances = attedances.filter(
+                Q(user__first_name__icontains = params['q'])|
+                Q(user__middle_name__icontains = params['q'])|
+                Q(user__last_name__icontains = params['q'])|
+                Q(user__suffix__icontains = params['q'])
+            )  
+        try:
+            paginator = Paginator(attedances, page_size) 
+            page_obj = paginator.page(page)
+            
+        except:
+            raise Http404()
+        
+        context.update({'page_obj': page_obj})
+        context.update({'paginator': paginator})    
+        context.update({'current_page': 'manage-activities'})
+        return context
     
 class ActivityOnGoing(LoginRequiredMixin, ListView):
     template_name = 'client/on-going-activities.html'
