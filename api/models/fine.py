@@ -21,3 +21,12 @@ class Fine(TimeStampedModel):
     def __str__(self):
         return f"{self.user}"
     
+    @property
+    def status_color(self):
+        MAP = {
+            'paid': 'success',
+            'unpaid': 'primary',
+            'removed': 'danger'        
+        }
+        return MAP.get(self.status, 'primary')
+    

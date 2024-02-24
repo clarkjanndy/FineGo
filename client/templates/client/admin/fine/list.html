@@ -58,16 +58,14 @@
                             <td>{{fine.user.get_full_name}}</td>                            
                             <td><b>{{fine.activity.group.name}}</b> - {{fine.activity}}</td>
                             <td>{{fine.amount}}</td>        
-                            <td>{{fine.get_status_display}}</td>               
+                            <td><span class="badge badge-{{fine.status_color}}">{{fine.status}}</span></td>               
                             <td>{{fine.created_at|date:"M d, Y"}}</td>
                             <!-- Action Buttons -->
                             <td>
-                                <button record-id="{{faq.id}}" type="button" class="btn btn-primary btn-sm"
+                                <button record-id="{{fine.id}}" type="button" class="btn btn-primary btn-sm"
                                     data-toggle="modal" data-target="#viewFineModal">
                                     <i class="bi bi-pencil-square"></i>
                                 </button>
-                                <button class="btn btn-sm btn-danger" record-id="{{faq.id}}"
-                                    onclick="handleDelete(this)"><i class="bi bi-trash"></i></button>
                             </td>
                         </tr>
                         {% empty %}
@@ -97,38 +95,37 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <form id="updateFaqForm">
-                    <div class="modal-body row">
+                <form id="viewFineForm">
+                    <div class="modal-body">
 
-                        <div class="col-lg-6 mb-3">
+                        <div class="col-lg-12 mb-3">
                             <label for="user" class="form-label">User: </label>
                             <input type="text" name="user" class="form-control" id="user"
                                 placeholder="User" disabled>
                         </div>
 
-                        <div class="col-lg-6 mb-3">
+                        <div class="col-lg-12 mb-3">
                             <label for="activity" class="form-label">Activity: </label>
                             <input type="text" name="activity" class="form-control" id="activity"
                                 placeholder="Activity" disabled>
                         </div>
 
-                        <div class="col-lg-6 mb-3">
+                        <div class="col-lg-12 mb-3">
                             <label for="amount" class="form-label">Amount: </label>
                             <input type="text" name="amount" class="form-control" id="amount"
                                 placeholder="Amount" disabled>
                             <small><i class="bi bi-exclamation-circle"> in peso</i></small>
                         </div>
 
-                        <div class="col-lg-6 mb-3">
+                        <div class="col-lg-12 mb-3">
                             <label for="status" class="form-label">Status: </label>
-                            <input type="text" name="amount" class="form-control" id="status"
-                                placeholder="Status" disabled>
-                        </div>  
-
-                        <div class="col-lg-6 mb-3">
-                            <label for="created_at" class="form-label">Date Created: </label>
-                            <input type="text" name="created_at" class="form-control" id="created_at"
-                                placeholder="Date Created" disabled>
+                            <select class="form-control" name="status" id="status">
+                                <option selected disabled value="">---</option>
+                                <option value="paid">Paid</option>
+                                <option value="unpaid">Unpaid</option>
+                                <option value="removed">Removed</option>
+                            </select>
+                            <small><i class="bi bi-exclamation-circle"> Edit this field to move fine to another status.</i></small>
                         </div>  
 
                     </div>
@@ -148,14 +145,14 @@
 <script script src=" {% static 'client/vendor/others/sweetalert.min.js' %}"></script>
 <script script src=" {% static 'client/vendor/others/just-validate.min.js' %}"></script>
 <script>
-    const handleUpdateModal = () => {
-        $('#updateFaqModal').on('show.bs.modal', (event) => {
+    const handleViewModal = () => {
+        $('#viewFineModal').on('show.bs.modal', (event) => {
             // Button that triggered the modal
             const button = event.relatedTarget;
             // Extract info from data-bs-* attributes
             const recordID = button.getAttribute('record-id');
             // Make your API call here (e.g., using the fetch() method)
-            const url = `/api/v1/faqs/${recordID}`;
+            const url = `/api/v1/fines/${recordID}`;
             const payload = {
                 headers: {
                     "X-CSRFToken": "{{csrf_token}}"
@@ -166,39 +163,39 @@
                 .then(response => response.json())
                 .then(response => {
                     // Update the modal's content.
-                    const form = updateFaqModal.querySelector('#updateFaqForm');
-                    const question = updateFaqModal.querySelector('#question');
-                    const answer = updateFaqModal.querySelector('#answer');
+                    const form = viewFineModal.querySelector('#viewFineForm');
+                    const user = viewFineModal.querySelector('#user');
+                    const activity = viewFineModal.querySelector('#activity');
+                    const amount = viewFineModal.querySelector('#amount');
+                    const status = viewFineModal.querySelector('#status');
                     data = response.data
 
                     form.setAttribute('record-id', data.id);
-                    question.value = data.question
-                    answer.value = data.answer
+                    user.value = data.user_detail.full_name
+                    activity.value = `${data.activity_detail.group} - ${data.activity_detail.activity}`
+                    amount.value = parseFloat(data.amount).toFixed(2);
+                    status.value = data.status                    
                 })
                 .catch(error => {
                     Swal.fire({
                         icon: 'error',
                         title: 'Oops...',
-                        text: 'Something went wrong!',
+                        text: error,
                         confirmButtonColor: '#4154f1',
                     })
                 });
         })
     };
-    handleUpdateModal();
+    handleViewModal();
 
     //form validator for update FAQ
-    const updateFaqForm = document.getElementById('updateFaqForm');
-    const updateFaqFormValidator = new window.JustValidate('#updateFaqForm', {
+    const viewFineForm = document.getElementById('viewFineForm');
+    const viewFineFormValidator = new window.JustValidate('#viewFineForm', {
     errorFieldCssClass: 'is-invalid',
     });
 
-    updateFaqFormValidator
-        .addField('#question', [{
-            rule: 'required',
-            errorMessage: 'This field is required',
-        },])
-        .addField('#answer', [{
+    viewFineFormValidator
+        .addField('#status', [{
             rule: 'required',
             errorMessage: 'This field is required',
         },])
@@ -209,7 +206,7 @@
             recordID = form.getAttribute('record-id');
 
             // create the payload data
-            const url = `/api/v1/faqs/${recordID}`; 
+            const url = `/api/v1/fines/${recordID}`; 
             const formData = new FormData(form);
             const payload =  {
                 headers: {
@@ -232,49 +229,12 @@
                     Swal.fire({
                         icon: 'error',
                         title: 'Oops...',
-                        text: 'Something went wrong!',
+                        text: error,
                         confirmButtonColor: '#4154f1',
                     })
                 });
         })
 
-    const handleDelete = (button) => {
-        const recordID = button.getAttribute('record-id');
-
-        Swal.fire({
-            title: "Are you sure?",
-            text: "You won't be able to revert this!",
-            showCancelButton: true,
-            confirmButtonColor: "#3085d6",
-            cancelButtonColor: "#d33",
-            confirmButtonText: "Yes, delete it!"
-        }).then((result) => {
-            if (result.isConfirmed) {
-                // Make your API call here (e.g., using the fetch() method)
-                const url = `/api/v1/faqs/${recordID}`;
-                const payload = {
-                    headers: {
-                        "X-CSRFToken": "{{csrf_token}}"
-                    },
-                    method: 'DELETE',
-                }
-                fetch(url, payload)
-                    .then(response => response.json())
-                    .then(response => {
-                        // reload page to get fresh data
-                        location.reload();
-                    })
-                    .catch(error => {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Oops...',
-                            text: 'Something went wrong!',
-                            confirmButtonColor: '#4154f1',
-                        })
-                    });
-            }
-        });
-    };
 </script>
 
 

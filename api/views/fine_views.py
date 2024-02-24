@@ -7,6 +7,8 @@ from rest_framework.response import Response
 from api.serializers import FineSerializer
 from api.models import Fine
 
+from api.exceptions import ClientError
+
 __all__ = ['FineById']
     
 class FineById(RetrieveUpdateAPIView):
@@ -33,12 +35,17 @@ class FineById(RetrieveUpdateAPIView):
         })
     
     def patch(self, request, *args, **kwargs):
-        response = super().patch(request, *args, **kwargs)
-        data = response.data
-        status = data['status']
+        obj = self.get_object()
+        data = request.data
+        serializer = self.serializer_class(obj, data=data, partial=True)
+        serializer.is_valid(raise_exception=True)
         
-        messages.success(request, f"Fine succesfully marked as {status}.")
+        # save only if status has changed
+        if not obj.status == data['status']:
+            serializer.save()            
+            messages.success(request, f"Fine succesfully marked as {serializer.data['status']}.")
+            
         return Response({
             "status": "success", 
-            "data": response.data
+            "data": serializer.data
         })
