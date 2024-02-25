@@ -10,7 +10,8 @@ from . models import (
     ActivityGroup,
     Activity,
     Attendance,
-    Fine
+    Fine,
+    Notification
 )
 
 # Register your admin manager here
@@ -52,6 +53,10 @@ class AttendanceAdmin(admin.ModelAdmin):
 class FineAdmin(admin.ModelAdmin):
     list_display = ('user', 'activity',  'amount', 'created_at')
     search_fields = ('user', 'activity',  'amount', 'created_at')
+    
+class NotificationAdmin(admin.ModelAdmin):
+    list_display = ('user', 'relation',  'content', 'status', 'created_at')
+    search_fields = ('user', 'relation',  'content', 'status', 'created_at')
 
 # Register your models here.
 admin.site.register(Department, DepartmentAdmin)
@@ -63,4 +68,5 @@ admin.site.register(ActivityGroup, ActivityGroupAdmin)
 admin.site.register(Activity, ActivityAdmin)
 admin.site.register(Attendance, AttendanceAdmin)
 admin.site.register(Fine, FineAdmin)
+admin.site.register(Notification, NotificationAdmin)
 
