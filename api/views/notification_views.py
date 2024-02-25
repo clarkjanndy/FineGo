@@ -13,13 +13,16 @@ class NotificationList(ListAPIView):
     serializer_class = NotificationSerializer
     
     def get_queryset(self):
-        queryset = super().get_queryset().filter(user = self.request.user)
-        return queryset
+        queryset = super().get_queryset().filter(user = self.request.user).order_by('-status', 'created_at')
+        return queryset[:5]
     
     def get(self, request, *args, **kwargs):
         response = super().get(request, *args, **kwargs)
 
         return Response({
             "status": "success", 
-            "data": response.data
+            "data": {
+                "count": len(response.data),
+                "rows": response.data
+            }
         })

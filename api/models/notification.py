@@ -21,6 +21,7 @@ class Notification(TimeStampedModel):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notifications')
     relation = models.CharField(max_length=8, default='others', choices=RELATION)
     content = models.TextField()
+    link = models.CharField(max_length = 100)
     status = models.CharField(max_length=8, default='unseen', choices=STATUS)
     
     def __str__(self):
