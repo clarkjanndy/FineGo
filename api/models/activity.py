@@ -31,6 +31,7 @@ class Activity(TimeStampedModel):
         ('active', 'Active'),
         ('open', 'Open'),
         ('closing', 'Closing'),
+        ('closing-error', 'Closing Error'),
         ('closed', 'Closed')
     )
     ALLOWED_ACTION = (
@@ -41,7 +42,7 @@ class Activity(TimeStampedModel):
     name = models.CharField(max_length=255)
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
-    status = models.CharField(choices=STATUS, max_length=10, default='active')
+    status = models.CharField(choices=STATUS, max_length=15, default='active')
     fine_amount = models.DecimalField(decimal_places=2, max_digits=10)
     allowed_action = models.CharField(choices=ALLOWED_ACTION, null=True, blank=True, max_length=10)
     
@@ -58,7 +59,8 @@ class Activity(TimeStampedModel):
             'active': 'primary',
             'open': 'success',
             'closing': 'warning',
-            'closed': 'danger'            
+            'closing-error': 'danger',
+            'closed': 'secondary'            
         }
         return MAP.get(self.status, 'secondary')
     
@@ -68,7 +70,7 @@ class Activity(TimeStampedModel):
     
     @property
     def is_closable(self):
-        return self.status in ['open', 'closing']
+        return self.status in ['open', 'closing-error']
         
     @property
     def get_num_attendee_incomplete(self):

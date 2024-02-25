@@ -10,6 +10,7 @@ from api.models import ActivityGroup, Activity, Attendance, Fine
 from api.permissions import IsAdminOrReadOnly
 
 from api.exceptions import SerializerValidationError, ClientError
+from api.tasks import issue_fines
 
 __all__ = ['ActivityGroupListCreate', 'ActivityGroupById', 'ActivityListCreate', 'ActivityById', 'ActivityClose', 'ActivityOpen']
 
@@ -177,34 +178,17 @@ class ActivityClose(ActivityById):
         
         activity.status = 'closing'
         activity.allowed_action = None
-        activity.save()
-        message = 'Activity is now closing.'
+        activity.save()      
+       
+        # call task to issue the fines
+        issue_fines(activity_id=activity.id, verbose_name="Issue Fines", creator=request.user)
         
-        try:
-            participants = activity.group.participants.all()
-            fine_issued = 0
-            
-            for participant in participants:
-                attendance = Attendance.objects.filter(activity=activity, user=participant, time_out__isnull=False).first()
-                if not attendance:
-                    fine, created = Fine.objects.get_or_create(user=participant, activity=activity, amount=activity.fine_amount)
-                    if created:
-                        fine_issued += 1
-                    
-            activity.status = 'closed'
-            message = 'Activity successfully closed.'
-            activity.save()
-        
-        except Exception as err:
-            messages.error(request, message:=f'An error has occured while closing activity. {str(err)}')
-            raise ClientError({"message": message})
-        
+        message = 'Activity is now closing.'     
         messages.success(request, message)          
         return Response({
             "status": "success", 
             "data": {
                 "message": message,
-                "fine_issued": fine_issued
             }
         })
         
