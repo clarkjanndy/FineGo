@@ -7,10 +7,7 @@ def notify_user_for_issued_fine(fine_id):
     notification = Notification.objects.create(
         user = fine.user,
         relation = 'fine',
-        content = f'''
-        You have been issued an amount of {fine.amount} pesos for not attending 
-        {fine.activity.group.name} - {fine.activity.name}.
-        '''
+        content = f'You have been issued an amount of {fine.amount} pesos for not attending {fine.activity.group.name} - {fine.activity.name}.'
     )
     print(f'Successfully notified user {notification.user} for fine issued.')
   

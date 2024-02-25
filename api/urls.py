@@ -10,6 +10,9 @@ urlpatterns = [
 
     # Profile
     path('profile', views.UserMyProfile.as_view()),
+    
+    # Notifications 
+    path('notifications', views.NotificationList.as_view()),
 
     # Users
     path('users', views.UserListCreate.as_view()),
