@@ -2,7 +2,6 @@ from django.db import models
 from . extras import TimeStampedModel
 
 from . user import User
-from . activity import Activity
 
 __all__ = ['Notification',]
 
