@@ -1,14 +1,39 @@
 from django.db import models
 from django.db.models import Count
+from background_task import background
 
 from . extras import TimeStampedModel
 from . user import User
+from . notification import Notification
 
 __all__ = ['ActivityGroup', 'Activity']
 
 def default_participants():
     participants = User.objects.filter(role='student')
     return participants
+
+@background(schedule=5)
+def notify_users_for_activity_changes(activity_id, activity_status):
+    # get activity instance
+    activity = Activity.objects.filter(id=activity_id).first()
+    # check activity
+    if not activity:
+        return False
+    
+    notified_user = 0
+    participants = activity.group.participants.all()  
+    for participant in participants:
+        content = f'{activity.group.name} - {activity.name} is now {activity_status}.'
+        Notification.objects.create(
+            user = participant,
+            relation = 'activity',
+            content = content,
+            link = '/on-going-activities' 
+        )
+        notified_user += 1
+    
+    print(f'Successfully notified {notified_user} users for activity changes of {activity.name}')
+    return True
 
 class ActivityGroup(TimeStampedModel):
     
@@ -51,6 +76,15 @@ class Activity(TimeStampedModel):
     
     def __str__(self):
         return f"{self.name}"
+    
+    def save(self, *args, **kwargs):
+        # check if it is an update to create notification
+        if self.pk:
+            old_instance = Activity.objects.get(id = self.pk)
+            if not old_instance.status == self.status:                     
+               notify_users_for_activity_changes(self.pk, self.status)           
+               
+        super().save(*args, **kwargs)
     
     @property
     def status_color(self):
