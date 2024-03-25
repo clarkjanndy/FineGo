@@ -1,25 +1,16 @@
 from background_task import background
 from api.models import Fine, Notification, User, Attendance, Activity
 
-@background(schedule=5)  
-def notify_user_for_issued_fine(fine_id):
-    fine = Fine.objects.select_related('activity', 'user').get(id = fine_id)
-    notification = Notification.objects.create(
-        user = fine.user,
-        relation = 'fine',
-        content = f'You have been issued an amount of {fine.amount} pesos for not attending {fine.activity.group.name} - {fine.activity.name}.',
-        link = '/my-fines'        
-    )
-    print(f'Successfully notified user {notification.user} for fine issued.')
-  
-
 @background(schedule=5)
 def issue_fines(activity_id):
     # get activity instance
-    activity = Activity.objects.get(id=activity_id)
+    activity = Activity.objects.filter(id=activity_id).first()
+    # check activity
+    if not activity:
+        return False
+    
     # get activity participants
     participants = activity.group.participants.all()
-   
     fine_issued = 0
     try:
         # loop all participants and check if they
@@ -29,9 +20,7 @@ def issue_fines(activity_id):
             if not attendance:
                 fine, created = Fine.objects.get_or_create(user=participant, activity=activity, amount=activity.fine_amount)
                 if created:
-                    notify_user_for_issued_fine(fine.id, verbose_name="Notify User For Issued Fine")
-                    fine_issued += 1
-                    
+                    fine_issued += 1            
         # set status to closed after successfull issuance
         activity.status = 'closed'
         activity.allowed_action = None
@@ -44,4 +33,4 @@ def issue_fines(activity_id):
         activity.save()  
                 
     print(f'Successfully issued {fine_issued} fines for activity {activity.name}')
-  
+    return True
