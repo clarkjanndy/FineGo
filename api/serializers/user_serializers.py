@@ -1,11 +1,13 @@
 from django.contrib.auth.hashers import make_password
 
+
+from rest_framework import serializers
 from rest_framework.serializers import ValidationError
 
 from api.models import User
-from .extras import CustomModelSerializer
+from .extras import CustomModelSerializer, CustomSerializer
 
-__all__ = ['UserSerializer']
+__all__ = ['UserSerializer', 'UserImportSerializer']
 
 class UserSerializer(CustomModelSerializer):
 
@@ -62,3 +64,6 @@ class UserSerializer(CustomModelSerializer):
                 validated_data['is_staff'] = False
                 
         return super().update(instance, validated_data)
+    
+class UserImportSerializer(CustomSerializer):
+    file = serializers.FileField()  

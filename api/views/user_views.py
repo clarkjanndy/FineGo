@@ -1,3 +1,5 @@
+import pandas
+
 from django.contrib import messages
 
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateAPIView, GenericAPIView
@@ -5,10 +7,14 @@ from rest_framework.permissions import IsAdminUser, IsAuthenticated, AllowAny
 from rest_framework.response import Response
 
 from api.exceptions import ClientError
-from api.serializers import UserSerializer
+from api.serializers import UserSerializer, UserImportSerializer
 from api.models import User
+from api.exceptions import ClientError
 
-__all__ = ['UserListCreate', 'UserById', 'UserActivateDeactivate', 'UserMyProfile']
+from api.utils.user_importer import UserImporter
+from api.utils.exceptions import InvalidFileHeaderException
+
+__all__ = ['UserListCreate', 'UserImport','UserById', 'UserActivateDeactivate', 'UserMyProfile']
 
 class UserListCreate(ListCreateAPIView):
     permission_classes = (IsAdminUser, )
@@ -31,6 +37,28 @@ class UserListCreate(ListCreateAPIView):
             "status": "success", 
             "data": response.data
         })
+        
+class UserImport(GenericAPIView):
+    permission_classes = (IsAdminUser, )
+    serializer_class = UserImportSerializer
+
+    def post(self, request, *args, **kwargs):      
+        data = request.data
+        serializer = self.serializer_class(data=data)
+        serializer.is_valid()
+        file = serializer.validated_data['file']
+        
+        try:
+            importer = UserImporter(file=file)
+            importer.start_parsing()
+            importer.start_import()
+            
+        except InvalidFileHeaderException as e:
+            raise ClientError({"message": str(e)}, 400)
+            
+            
+        return Response({})
+         
     
 class UserById(RetrieveUpdateAPIView):
     permission_classes = (AllowAny, )

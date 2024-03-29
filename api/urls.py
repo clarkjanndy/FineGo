@@ -19,6 +19,7 @@ urlpatterns = [
 
     # Users
     path('users', views.UserListCreate.as_view()),
+    path('users/import', views.UserImport.as_view()),
     path('users/<int:pk>', views.UserById.as_view()),
     path('users/<int:pk>/activate-or-deactivate', views.UserActivateDeactivate.as_view()),
 
