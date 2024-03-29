@@ -93,9 +93,15 @@
 
                                 {% if not person.is_superuser %}
                                 <div class="row">
+                                    <div class="col-lg-3 col-md-4 label ">Year Level: </div>
+                                    <div class="col-lg-9 col-md-8">{{person.year_level_text}}</div>
+                                </div>
+
+                                <div class="row">
                                     <div class="col-lg-3 col-md-4 label ">Student Id</div>
                                     <div class="col-lg-9 col-md-8">{{person.student_id}}</div>
                                 </div>
+
                                 {% endif %}
 
                                 <div class="row">
@@ -219,6 +225,19 @@
                             </div>
                         </div>
 
+                        <div class="row mb-3" id="yearLevelContainer">
+                            <label for="gender" class="col-md-4 col-lg-3 col-form-label">Year Level</label>
+                            <div class="col-md-8 col-lg-9">
+                                <select class="form-control" name="year_level" id="year_level">
+                                    <option selected disabled value="">---</option>
+                                    <option value="1" {{person.year_level|is_selected:1}}>1st Year</option>
+                                    <option value="2" {{person.year_level|is_selected:2}}>2nd Year</option>
+                                    <option value="3" {{person.year_level|is_selected:3}}>3rd Year</option>
+                                    <option value="4" {{person.year_level|is_selected:4}}>4th Year</option>
+                                </select>
+                            </div>
+                        </div>
+
                         <div class="row mb-3" id="studentIdContainer">
                             <label for="student_id" class="col-md-4 col-lg-3 col-form-label">Student
                                 Id</label>
@@ -255,9 +274,8 @@
                                 <select class="form-control" name="department" id="department">
                                     <option selected value="">---</option>
                                     {% for dep in departments %}
-                                    <option 
-                                    {% if person.department.id is dep.id %}selected{% endif %}
-                                    value="{{dep.id}}">{{dep.name}}</option>
+                                    <option {% if person.department.id is dep.id %}selected{% endif %}
+                                        value="{{dep.id}}">{{dep.name}}</option>
                                     {% endfor %}
                                 </select>
                             </div>
@@ -358,26 +376,40 @@
     //track changes on the role dropdown
     const roleSelect = document.getElementById('role');
     const studentIdContainer = document.getElementById('studentIdContainer');
+    const yearLevelContainer = document.getElementById('yearLevelContainer');
 
     const handleShowStudId = (selectedRole) => {
         // hide if selected role is admin
         if (selectedRole == 'admin') {
             studentIdContainer.classList.add('d-none')
-
             // remove rules from validator
             updateUserFormValidator
                 .removeField('#student_id')
 
+            yearLevelContainer.classList.add('d-none')
+            // remove rules from validator
+            updateUserFormValidator
+                .removeField('#year_level')
+
             // show if otherwise
         } else {
             studentIdContainer.classList.remove('d-none')
-
             //add rules to validator
             updateUserFormValidator
                 .addField('#student_id', [{
                     rule: 'required',
                     errorMessage: 'This field is required',
                 },])
+
+            yearLevelContainer.classList.remove('d-none')
+            //add rules to validator
+            updateUserFormValidator
+                .addField('#year_level', [{
+                    rule: 'required',
+                    errorMessage: 'This field is required',
+                },])
+
+            studentIdContainer.classList.remove('d-none')
         }
     }
     handleShowStudId(roleSelect.value)

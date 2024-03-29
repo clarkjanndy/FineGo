@@ -114,6 +114,17 @@
                     </select>
                 </div>
 
+                <div class="col-lg-6 d-none mb-3" id="yearLevelContainer">
+                    <label for="gender" class="form-label">Year Level: </label>
+                    <select class="form-control" name="year_level" id="year_level">
+                        <option selected disabled value="">---</option>
+                        <option value="1">1st Year</option>
+                        <option value="2">2nd Year</option>
+                        <option value="3">3rd Year</option>
+                        <option value="4">4th Year</option>
+                    </select>
+                </div>
+
                 <div class="col-lg-6 d-none mb-3" id="studentIdContainer">
                     <label for="student_id" class="form-label">Student Id: </label>
                     <input type="email" name="student_id" class="form-control" id="student_id" required
@@ -150,28 +161,43 @@
     //track changes on the role dropdown
     const roleSelect = document.getElementById('role');
     const studentIdContainer = document.getElementById('studentIdContainer');
+    const yearLevelContainer = document.getElementById('yearLevelContainer');
+
 
     roleSelect.addEventListener('change', (evt) => {
         const selectedRole = roleSelect.value
         // hide if selected role is admin
         if (selectedRole == 'admin') {
             studentIdContainer.classList.add('d-none')
-
             // remove rules from validator
             createUserFormValidator
                 .removeField('#student_id')
 
+            
+            yearLevelContainer.classList.add('d-none')
+            // remove rules from validator
+            createUserFormValidator
+                .removeField('#year_level')
 
-            // show if otherwise
+        // show if otherwise
         } else {
             studentIdContainer.classList.remove('d-none')
-
             //add rules to validator
             createUserFormValidator
                 .addField('#student_id', [{
                     rule: 'required',
                     errorMessage: 'This field is required',
                 },])
+
+            yearLevelContainer.classList.remove('d-none')
+            //add rules to validator
+            createUserFormValidator
+                .addField('#year_level', [{
+                    rule: 'required',
+                    errorMessage: 'This field is required',
+                },])
+
+            studentIdContainer.classList.remove('d-none')
         }
     })
 

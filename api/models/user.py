@@ -16,6 +16,7 @@ class User(AbstractUser):
     )
 
     department = models.ForeignKey('Department', null=True, blank=True, on_delete=models.CASCADE, related_name='members')
+    year_level = models.IntegerField(null=True, blank=True)
     email = models.EmailField(unique=True)
     role = models.CharField(max_length=15, choices=ROLES, default='student')
     middle_name = models.CharField(max_length=150,  null=True, blank=True)
@@ -50,6 +51,17 @@ class User(AbstractUser):
     def get_status(self):
         return 'active' if self.is_active else 'inactive'
     
+    @property
+    def year_level_text(self):
+       MAP = {
+           1: "1st Year",
+           2: "2nd Year",
+           3: "3rd Year",
+           4: "4th Year"
+       }
+       
+       return MAP.get(self.year_level, "1st Year")
+       
     @property
     def default_photo_url(self):        
         return f"{settings.STATIC_URL}client/img/default-profile.webp"
