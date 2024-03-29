@@ -5,7 +5,7 @@ __all__ = ['Department']
 
 class Department(TimeStampedModel):
     name = models.CharField(max_length=255)
-    abbreviation = models.CharField(max_length=2)
+    abbreviation = models.CharField(max_length=6)
     description = models.TextField(null=True, blank=True)
     theme = models.CharField(max_length=255, default='#4e73df')
 
@@ -18,5 +18,5 @@ class Department(TimeStampedModel):
 
     @property
     def card_style(self):
-        return f'style="height: 150px; background-color: {self.theme}"'
+        return f'style="height: 200px; background-color: {self.theme}"'
     
