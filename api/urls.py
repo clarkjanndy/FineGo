@@ -15,6 +15,7 @@ urlpatterns = [
     path('notifications', views.NotificationList.as_view()),
     path('notifications/mark-as-read-all', views.NotificationMarkReadAll.as_view()),
     path('notifications/<int:pk>/mark-as-read', views.NotificationMarkRead.as_view()),
+    path('stream', views.StreamEvent.as_view()),
 
     # Users
     path('users', views.UserListCreate.as_view()),
