@@ -9,7 +9,7 @@ from rest_framework.response import Response
 from api.exceptions import ClientError
 from api.serializers import UserSerializer, UserImportSerializer
 from api.models import User
-from api.exceptions import ClientError
+from api.exceptions import ClientError, ServerError
 
 from api.utils.user_importer import UserImporter
 from api.utils.exceptions import InvalidFileHeaderException
@@ -51,15 +51,19 @@ class UserImport(GenericAPIView):
         try:
             importer = UserImporter(file=file)
             importer.start_parsing()
-            importer.start_import()
+            stats = importer.start_import()
             
         except InvalidFileHeaderException as e:
             raise ClientError({"message": str(e)}, 400)
+        
+        except Exception as e:
+            raise ServerError()
             
-            
-        return Response({})
+        return Response({
+            "status": "success",
+            "data": stats
+        })
          
-    
 class UserById(RetrieveUpdateAPIView):
     permission_classes = (AllowAny, )
     queryset = User.objects.all()

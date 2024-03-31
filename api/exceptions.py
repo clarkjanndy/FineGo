@@ -4,7 +4,7 @@ from rest_framework import status
 from django.utils.translation import gettext_lazy as _
 
 
-__all__ = ['SerializerValidationError', 'AuthenticationFailed', 'ClientError']
+__all__ = ['SerializerValidationError', 'ServerError','AuthenticationFailed', 'ClientError']
 
 class SerializerValidationError(ValidationError):
     '''
@@ -21,6 +21,21 @@ class SerializerValidationError(ValidationError):
             'status': 'failed',
             'data': detail,
         }       
+        self.status_code = status_code
+        
+class ServerError(APIException):
+    '''
+    Custom exception for client-side related errors.
+    '''
+    
+    status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+    default_detail = _('Internal server error.')
+
+    def __init__(self, detail=default_detail, status_code=status_code):
+        self.detail = {
+            'status': 'error',
+            'data': detail,
+        }
         self.status_code = status_code
 
 class ClientError(APIException):

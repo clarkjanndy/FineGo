@@ -24,7 +24,7 @@ class UserAdmin(DefaultUserAdmin):
 
     fieldsets = (
         (_("Credentials"), {"fields": ("username", "password")}),
-        (_("Information"), {"fields": ("year_level", "student_id", "email", "first_name", 
+        (_("Information"), {"fields": ("year_level", "department", "student_id", "email", "first_name", 
                                        "middle_name", "last_name", "suffix", "birthday",
                                        "mobile_number", "address", "bio", "photo")}),
         (_("Important dates"), {"fields": ("last_login", "date_joined")}),
