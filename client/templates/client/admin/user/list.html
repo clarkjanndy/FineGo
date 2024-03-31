@@ -28,9 +28,16 @@
             <div class="table-responsive">
 
                 <div class="d-flex justify-content-end mb-4">
-                    <a href="/admin/manage-users/create" class="btn btn-primary">
-                        <i class="bi bi-plus-square"></i> Create User
-                    </a>
+
+                    <div>
+                        <a data-toggle="modal" data-target="#importFileModal" class="btn btn-primary">
+                            <i class="bi bi-file-earmark-text"></i> Import Users From File
+                        </a>
+
+                        <a href="/admin/manage-users/create" class="btn btn-primary">
+                            <i class="bi bi-plus-square"></i> Create User
+                        </a>
+                    </div>
                 </div>
 
                 {% include 'client/components/table_search.html' %}
@@ -90,13 +97,179 @@
             </div>
         </div>
     </div>
-
-
 </div>
 <!-- /.container-fluid -->
+
+<div class="modal fade" id="importFileModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Import Users From File</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="importUserForm">
+                <div class="modal-body">
+                    <p>
+                        <h6>Notes on file import:</h6>
+                        <ul>
+                            <li>Check the headers of the file before importing. File must contain these headers, 
+                                <code>lastname</code>, 
+                                <code>firstname</code>, 
+                                <code>middlename</code>, 
+                                <code>extension</code>, 
+                                <code>gender</code>, 
+                                <code>address</code>, 
+                                <code>birthdate</code>, 
+                                <code>course</code>,
+                                <code>year_level</code>,
+                                <code>mobile</code>
+                            </li>
+                            <li>Check for data on each of the column of the csv/excel.</li>
+                            <li>Only csv, xls and xsls files are accepted.</li>
+                            <li>The imported users will have their email as username and password as default credentials on login.</li>
+                        </ul>
+
+                        <a href=" {% static 'client/data/sample-data-for-user-import.xlsx' %}">Click here to download sample data</a>
+                    </p>
+                    <div id="file-drop" class="mb-3">
+                        <p class="mb-0">Drag and drop file here or click to browse</p>
+                        <input type="file" id="file" name="file" class="form-control" style="display: none;" required
+                            accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
+                    </div>
+
+                    <div id="previewContainer" class="d-none text-center  mb-2"></div>
+
+                    <div class="d-flex justify-content-center">
+                        <button class="btn btn-primary btn" type="submit"><i class="bi bi-upload"></i>
+                            Upload</button>
+                    </div>
+
+                </div>
+            </form><!-- End Profile Edit Form -->
+        </div>
+    </div>
+</div><!-- End Create FAQ Modal-->
+
 <script script src=" {% static 'client/vendor/others/sweetalert.min.js' %}"></script>
 <script script src=" {% static 'client/vendor/others/just-validate.min.js' %}"></script>
 <script>
+    // file uploader
+    const fileDrop = document.getElementById('file-drop');
+    const fileInput = document.getElementById('file');
+    const previewContainer = document.getElementById('previewContainer');
+
+    fileDrop.addEventListener('dragover', function (e) {
+        e.preventDefault();
+        fileDrop.classList.add('border-primary');
+    });
+
+    fileDrop.addEventListener('dragleave', function (e) {
+        e.preventDefault();
+        fileDrop.classList.remove('border-primary');
+    });
+
+    fileDrop.addEventListener('drop', function (e) {
+        e.preventDefault();  // Prevent the default behavior
+        fileDrop.classList.remove('border-primary');
+        fileInput.files = e.dataTransfer.files
+        previewFiles(e.dataTransfer.files);
+    });
+
+    fileDrop.addEventListener('click', function () {
+        fileInput.click();
+    });
+
+    fileInput.addEventListener('change', function () {
+        previewFiles(this.files);
+    });
+
+    const previewFiles = (files) => {
+        previewContainer.classList.remove('d-none')
+        const [file] = files
+        if (file) {
+            previewContainer.innerText = file.name
+        }
+    }
+
+    // form submission
+    const importUserFormValidator = new window.JustValidate('#importUserForm', {
+        errorFieldCssClass: 'is-invalid',
+    });
+
+    importUserFormValidator
+        .addField('#file', [{
+            rule: 'required',
+            errorMessage: 'This field is required.',
+        }, {
+            validator: () => {
+                let [file] = fileInput.files
+                if (!file) {
+                    return false
+                }
+
+                return true
+            },
+            errorMessage: 'This field is required.',
+        },])
+        .onSuccess(async (event) => {
+            event.preventDefault();
+            form = event.target
+            // Make your API call here (e.g., using the fetch() method)
+            const url = '/api/v1/users/import';
+            const formData = new FormData(form);
+            const payload = {
+                headers: {
+                    "X-CSRFToken": "{{csrf_token}}"
+                },
+                method: 'POST',
+                body: formData
+            }
+            const loadingModal = Swal.fire({
+                title: 'Loading...',
+                html: 'Uploading of user data will take a long time.<br> <b>Please do not close or refresh this window!</b>',
+                icon: 'info',
+                allowOutsideClick: false,
+                showConfirmButton: false,
+                willOpen: () => {
+                    Swal.showLoading();
+                }
+            })
+
+            const response = await fetch(url, payload);
+            const response_json = await response.json();
+
+            if (response_json.status == 'success') {
+                $(importFileModal).modal('hide');
+                data = response_json.data
+
+                Swal.fire({
+                    icon: "success",
+                    title: "Import Success",
+                    html: `<b>${data.created.count}</b> user created, <b>${data.updated.count}</b> user updated, <b>${data.errors.count}</b> error in importing.`,
+                    showConfirmButton: true, 
+                    confirmButtonColor: '#4e73df'
+                });
+
+            } else {
+                // store error data
+                const errors = response_json.data
+                // create a blank variable to store error
+                const field_errors = {}
+                // add hashtags to keys
+                Object.keys(errors).forEach(key => {
+                    const value = errors[key];
+                    field_errors[`#${key}`] = value
+                });
+                // show field errors to user
+                importUserFormValidator.showErrors(field_errors)
+            }
+
+
+            loadingModal.close()
+        });
+
     const handleActivateDeactivate = (button) => {
         const recordID = button.getAttribute('record-id');
         const action = button.getAttribute('action');

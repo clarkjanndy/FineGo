@@ -11312,4 +11312,16 @@ body.sidebar-toggled footer.sticky-footer {
   color: rgba(1, 41, 112, 0.6);
 }
 
+#file-drop {
+  border: 2px dashed #ccc;
+  padding: 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.3s;
+}
+
+#file-drop:hover {
+  transform: scale(1.02);
+}
+
 

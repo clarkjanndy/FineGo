@@ -67,3 +67,12 @@ class UserSerializer(CustomModelSerializer):
     
 class UserImportSerializer(CustomSerializer):
     file = serializers.FileField()  
+    
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        
+        file_type = attrs['file'].name.split(".")[-1].lower()
+        if file_type not in  ['xls', 'xlsx', 'csv']:
+            raise serializers.ValidationError({'file':'Unsupported file type. Must be one of ["xls", "xlsx", "csv].'})
+        
+        return attrs

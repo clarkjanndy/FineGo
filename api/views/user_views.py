@@ -56,9 +56,6 @@ class UserImport(GenericAPIView):
         except InvalidFileHeaderException as e:
             raise ClientError({"message": str(e)}, 400)
         
-        except Exception as e:
-            raise ServerError()
-            
         return Response({
             "status": "success",
             "data": stats
