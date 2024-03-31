@@ -75,6 +75,8 @@ WSGI_APPLICATION = 'core.wsgi.application'
 
 AUTH_USER_MODEL = 'api.User'  
 
+DATA_UPLOAD_MAX_NUMBER_FIELDS = 10_000
+
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
