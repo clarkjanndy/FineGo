@@ -6,4 +6,4 @@ __all__ = ['NotificationSerializer']
 class NotificationSerializer(CustomModelSerializer):
     class Meta:
         model = Notification
-        fields = ('relation', 'content', 'link', 'status', 'created_at')
+        exclude = ('user', )

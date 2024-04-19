@@ -186,11 +186,33 @@
         return formattedDate
     }
 
+    const markAsRead = (id) => {
+        const url = `/api/v1/notifications/${id}/mark-as-read`;
+        const payload = {
+            method: 'POST',
+            headers: {
+                "X-CSRFToken": "{{csrf_token}}",
+                "Content-Type": 'application/json'
+            }
+        }
+        fetch(url, payload)
+            .then(response => response.json())
+            .then(response => { console.log('marking as read..') })
+            .catch(error => {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: error,
+                    confirmButtonColor: '#4154f1',
+                })
+            });
+    }
+
     const renderNotification = (notification) => {
         // Create a new HTML structure using JavaScript
         var newItem = document.createElement('a');
         newItem.className = 'dropdown-item d-flex align-items-center';
-        newItem.href = `${notification.link}`;
+        // newItem.href = `${notification.link}`;
 
         // Create the first div with nested div and icon
         newItem.innerHTML = `
@@ -205,9 +227,15 @@
         newItem.innerHTML += `
             <div>
                 <div class="small text-gray-500">${formatDate(notification.created_at)}</div>
-                <span class="${notification.status == 'unseen' ? 'font-weight-bold':''}">${notification.content}</span>
+                <span class="${notification.status == 'unseen' ? 'font-weight-bold' : ''}">${notification.content}</span>
             </div>
         `;
+
+        // add event to redirect to notif link
+        newItem.addEventListener('click', function () {
+            markAsRead(notification.id)
+            window.location.href = notification.link
+        });
 
         notificationContainer.appendChild(newItem);
     }
@@ -229,7 +257,7 @@
                 notifications = data.rows
                 count = data.count
 
-                if (count){
+                if (count) {
                     notifcationCount.classList.remove('d-none')
                     notifcationCount.innerText = count
                 }
@@ -238,14 +266,6 @@
                     renderNotification(obj)
                 })
             })
-            .catch(error => {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Oops...',
-                    text: error,
-                    confirmButtonColor: '#4154f1',
-                })
-            });
     }
     getNotifications()
 
