@@ -255,14 +255,17 @@
             } else {
                 // store error data
                 const errors = response_json.data
+                let field_errors = {}
                 // create a blank variable to store error
-                const field_errors = {}
-                // add hashtags to keys
-                Object.keys(errors).forEach(key => {
-                    const value = errors[key];
-                    field_errors[`#${key}`] = value
-                });
-                // show field errors to user
+                if (errors.message){
+                    field_errors["#file"] = errors.message
+                }
+
+                if (errors.file){
+                    field_errors["#file"] = errors.file
+                }
+                
+                // // show field errors to user
                 importUserFormValidator.showErrors(field_errors)
             }
 
