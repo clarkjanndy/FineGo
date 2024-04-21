@@ -3,7 +3,6 @@
 {% load static %}
 
 {% block content %}
-
 <div class="container-fluid">
 
     <!-- Page Heading -->
@@ -29,7 +28,7 @@
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
                                 Users</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">1</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{user_count}}</div>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-user fa-2x text-gray-300"></i>
@@ -47,7 +46,7 @@
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
                                 Activities</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">1</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{activity_count}}</div>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-chart-line fa-2x text-gray-300"></i>
@@ -57,41 +56,43 @@
             </div>
         </div>
 
-        <!-- Earnings (Monthly) Card Example -->
+        <!-- Pending Requests Card Example -->
         <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-success shadow h-100 py-2">
+            <div class="card border-left-info shadow h-100 py-2">
                 <div class="card-body">
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
-                                Fines Issued</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">1</div>
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                On-going Activities</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{on_going_activity_count}}</div>
                         </div>
                         <div class="col-auto">
-                            <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+                            <i class="bi bi-calendar-event-fill fa-2x text-gray-300"></i>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Pending Requests Card Example -->
+        <!-- Earnings (Monthly) Card Example -->
         <div class="col-xl-3 col-md-6 mb-4">
             <div class="card border-left-warning shadow h-100 py-2">
                 <div class="card-body">
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
-                                Pending Requests</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">18</div>
+                                Fines Issued</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">&#8369; {{fine_issued}}</div>
                         </div>
                         <div class="col-auto">
-                            <i class="fas fa-comments fa-2x text-gray-300"></i>
+                            <span class="fa-2x text-gray-300">&#8369;</span>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+
+
     </div>
 
     <!-- Content Row -->
@@ -103,8 +104,8 @@
             <div class="card shadow mb-4">
                 <!-- Card Header - Dropdown -->
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-primary">Earnings Overview</h6>
-                    <div class="dropdown no-arrow">
+                    <h6 class="m-0 font-weight-bold text-primary">Attendance and Fines</h6>
+                    <!-- <div class="dropdown no-arrow">
                         <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown"
                             aria-haspopup="true" aria-expanded="false">
                             <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
@@ -117,12 +118,55 @@
                             <div class="dropdown-divider"></div>
                             <a class="dropdown-item" href="#">Something else here</a>
                         </div>
-                    </div>
+                    </div> -->
                 </div>
                 <!-- Card Body -->
                 <div class="card-body">
-                    <div class="chart-area">
-                        <canvas id="myAreaChart"></canvas>
+                    <div class="">
+                        <div id="barGraph"></div>
+                        <script>
+                            document.addEventListener("DOMContentLoaded", async () => {
+                                const url = "/api/v1/analytics/attendance-and-fines-bar-graph/"
+                                const payload = {
+                                    headers: { "X-CSRFToken": "{{csrf_token}}" },
+                                    method: 'GET',
+                                }
+
+                                const response = await fetch(url, payload);
+                                const data = await response.json();
+
+                                var options = {
+                                    series: data.data.series,
+                                    chart: {
+                                        type: 'bar', // Change to 'bar' for column graph
+                                        height: 350,
+                                        toolbar: {
+                                            show: false
+                                        }
+                                    },
+                                    xaxis: {
+                                        categories: data.data.categories
+                                    },
+                                    fill: {
+                                        type: 'solid',
+                                        gradient: {
+                                            shade: 'dark',
+                                            type: "vertical",
+                                        }
+                                    },
+                                    dataLabels: {
+                                        enabled: true
+                                    },
+                                    legend: {
+                                        show: true
+                                    },
+
+                                };
+
+                                var chart = new ApexCharts(document.querySelector("#barGraph"), options);
+                                chart.render();
+                            });
+                        </script>
                     </div>
                 </div>
             </div>
@@ -133,8 +177,8 @@
             <div class="card shadow mb-4">
                 <!-- Card Header - Dropdown -->
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-primary">Revenue Sources</h6>
-                    <div class="dropdown no-arrow">
+                    <h6 class="m-0 font-weight-bold text-primary">User Distribution</h6>
+                    <!-- <div class="dropdown no-arrow">
                         <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown"
                             aria-haspopup="true" aria-expanded="false">
                             <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
@@ -147,38 +191,155 @@
                             <div class="dropdown-divider"></div>
                             <a class="dropdown-item" href="#">Something else here</a>
                         </div>
-                    </div>
+                    </div> -->
                 </div>
                 <!-- Card Body -->
                 <div class="card-body">
-                    <div class="chart-pie pt-4 pb-2">
-                        <canvas id="myPieChart"></canvas>
-                    </div>
-                    <div class="mt-4 text-center small">
-                        <span class="mr-2">
-                            <i class="fas fa-circle text-primary"></i> Direct
-                        </span>
-                        <span class="mr-2">
-                            <i class="fas fa-circle text-success"></i> Social
-                        </span>
-                        <span class="mr-2">
-                            <i class="fas fa-circle text-info"></i> Referral
-                        </span>
+                    <div class="">
+                        <div id="piechart"></div>
+                        <script>
+                            document.addEventListener("DOMContentLoaded", async () => {
+                                const url = "/api/v1/analytics/user-distribution-pie-chart/"
+                                const payload = {
+                                    headers: { "X-CSRFToken": "{{csrf_token}}" },
+                                    method: 'GET',
+                                }
+
+                                const response = await fetch(url, payload);
+                                const data = await response.json();
+
+                                var options = {
+                                    legend: {
+                                        position: 'bottom',
+                                    },
+                                    series: data.data.series,
+                                    chart: {
+                                        width: 350,
+                                        height: 400,
+                                        type: 'pie',
+                                    },
+                                    labels: data.data.labels,
+                                };
+
+                                var chart = new ApexCharts(document.querySelector("#piechart"), options);
+                                chart.render();
+                            });
+                        </script>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    
+    <div class="row">
+        <div class="col-xl-8 col-lg-7">
+            <div class="card shadow mb-4">
+                <!-- Card Header - Dropdown -->
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Recent Attendance</h6>
+                </div>
+                <!-- Card Body -->
+                <div class="card-body">
+                    <div class="table-responsive">
+
+                        <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Date</th>
+                                    <th scope="col">Activity</th>
+                                    <th scope="col">User</th>
+                                    <th scope="col">---</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for atr in attendance_recent %}
+                                <tr>
+                                    <th scope="row">{{forloop.counter}}</th>
+                                    <td>{{atr.modified_at|date:"M d, Y"}}</td>
+                                    <td>{{atr.activity.group.name}} - {{atr.activity.name}}</td>
+                                    <td>{{atr.user.get_full_name}}</td>
+                                    <!-- Action Buttons -->
+                                    <td>
+                                        <a
+                                            href="/admin/manage-activities/groups/{{atr.activity.group.pk}}/activities/{{atr.activity.pk}}">Go
+                                            To Activity</a>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="7">
+                                        <div class="d-flex justify-content-center">Nothing to show here.<div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+
+                            </tbody>
+                        </table>
+
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+        <div class="col-xl-4 col-lg-5">
+            <div class="card shadow mb-4">
+                <!-- Card Header - Dropdown -->
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">On-going Activities</h6>
+                </div>
+                <!-- Card Body -->
+                <div class="card-body">
+                    <div class="table-responsive">
+
+                        <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Activity</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for ongoing in on_going_activities %}
+                                <tr>
+                                    <th scope="row">{{forloop.counter}}</th>
+                                    <td>
+                                        <a href="/admin/manage-activities/groups/{{ongoing.group.pk}}/activities/{{ongoing.pk}}"">
+                                            {{ongoing.group.name}} - {{ongoing.name}}
+                                        </a>
+                                        
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan=" 7">
+                                            <div class="d-flex justify-content-center">Nothing to show here.<div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+
+                            </tbody>
+                        </table>
+
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
 
 </div>
 <!-- /.container-fluid -->
 <!-- Page level plugins -->
-<script src="{%static 'client/vendor/chart.js/Chart.min.js'%}"></script>
+<script src="{%static 'client/vendor/others/apexcharts.min.js'%}"></script>
 
 <!-- Page level custom scripts -->
-<script src="{%static 'client/js/demo/chart-area-demo.js'%}"></script>
-<script src="{%static 'client/js/demo/chart-pie-demo.js'%}"></script>
+<!-- <script src="{%static 'client/js/demo/chart-area-demo.js'%}"></script> -->
+<!-- <script src="{%static 'client/js/demo/chart-pie-demo.js'%}"></script> -->
 
 {%endblock content%}

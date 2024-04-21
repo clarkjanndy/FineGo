@@ -1,7 +1,14 @@
-from django.urls import path
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
 from api import views
 
-urlpatterns = [
+analytics_router = DefaultRouter()
+analytics_router.register('analytics', views.AnalyticsView)
+
+urlpatterns = [    
+     #Analytics
+    path('', include(analytics_router.urls)),
+    
     # Auth
     path('login', views.LoginView.as_view()),
     path('logout', views.LogoutView.as_view()),
@@ -48,5 +55,7 @@ urlpatterns = [
     
     # Fine
     path('fines/<int:pk>', views.FineById.as_view()),
+    
+    
 
 ]
