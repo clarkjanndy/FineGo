@@ -70,6 +70,7 @@ class UserImporter:
                 user, created = User.objects.update_or_create(
                     username = username,
                     email = row['email'],
+                    student_id = row['student_id'],
                     first_name = row['firstname'],
                     middle_name = row['middlename'],
                     last_name = row['lastname'],

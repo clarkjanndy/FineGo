@@ -115,6 +115,7 @@
                         <h6>Notes on file import:</h6>
                         <ul>
                             <li>Check the headers of the file before importing. File must contain these headers, 
+                                <code>student_id</code>, 
                                 <code>lastname</code>, 
                                 <code>firstname</code>, 
                                 <code>middlename</code>, 
@@ -250,6 +251,10 @@
                     html: `<b>${data.created.count}</b> user created, <b>${data.updated.count}</b> user updated, <b>${data.errors.count}</b> error in importing.`,
                     showConfirmButton: true, 
                     confirmButtonColor: '#4e73df'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.reload()
+                    }
                 });
 
             } else {
