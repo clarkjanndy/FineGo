@@ -100,6 +100,13 @@
         </a>
     </li>
 
+    <li class="nav-item {% if current_page == 'my-fines' %}active{% endif %}">
+        <a class="nav-link" href="/my-qr">
+            <i class="bi bi-qr-code"></i>
+            <span>My QR Code</span>
+        </a>
+    </li>
+
     {% if user.is_superuser %}
     <!-- Nav Item - FAQs-->
     <li class="nav-item {% if current_page == 'manage-faqs' %}active{% endif %}">
