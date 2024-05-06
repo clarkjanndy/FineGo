@@ -1,4 +1,4 @@
-from django.db.models import Q
+from django.db.models import Q, Sum
 from django.views.generic import ListView
 
 from api.models import Fine
@@ -12,10 +12,17 @@ class UserFines(LoginRequiredMixin, ListView):
     queryset = Fine.objects.all()
     paginate_by = 10
     ordering = ('-modified_at', )
-
+    
+    def get_fine_amount(self):
+        total_fines = self.queryset.filter(user = self.request.user).\
+            aggregate(total_amount=Sum('amount'))
+    
+        return total_fines.get("total_amount", 0)
+        
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update({'current_page': 'my-fines'})
+        context.update({'total_fines': self.get_fine_amount()})
         return context
 
     def get_queryset(self):
