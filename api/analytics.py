@@ -99,3 +99,27 @@ def fine_reports():
             'total_fine': total_fine
         }
     }
+    
+def recent_activity_attendance_pie_chart():
+    open_activity = Activity.objects.filter(status='open').order_by('-modified_at').first()
+    
+    if not open_activity:
+        return {}
+    
+    qs = Department.objects.prefetch_related(
+        'members'
+    ).filter(
+        members__attendance__activity = open_activity
+    ).annotate(
+        attendance_count = Count('members__attendance'),     
+    ).values('abbreviation', 'attendance_count',).order_by("abbreviation")
+    
+    data = {
+        "labels": [item['abbreviation'] for item in qs],
+        "series": [item['attendance_count'] for item in qs],
+        "activity_name": f"{open_activity.group.name} - {open_activity.name}"
+    }
+    
+    return data
+    
+    

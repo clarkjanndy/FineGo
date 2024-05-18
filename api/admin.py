@@ -11,10 +11,15 @@ from . models import (
     Activity,
     Attendance,
     Fine,
-    Notification
+    Notification,
+    Semester
 )
 
 # Register your admin manager here
+class SemesterAdmin(admin.ModelAdmin):
+    list_display = ('academic_year', 'date_open', 'date_close', 'created_at', 'modified_at')
+    search_fields = ('academic_year', 'date_open', 'date_close')
+    
 class DepartmentAdmin(admin.ModelAdmin):
     list_display = ('name', 'abbreviation',)
     search_fields = ('name', 'abbreviation',)
@@ -59,6 +64,8 @@ class NotificationAdmin(admin.ModelAdmin):
     search_fields = ('user', 'relation',  'content', 'status', 'created_at')
 
 # Register your models here.
+admin.site.register(Semester, SemesterAdmin)
+
 admin.site.register(Department, DepartmentAdmin)
 admin.site.register(User, UserAdmin)
 admin.site.register(FAQ, FAQAdmin)

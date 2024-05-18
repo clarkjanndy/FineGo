@@ -22,6 +22,14 @@ class AnalyticsView(ViewSet):
            "type": "success",
            "data": data
        })
+       
+    @action(methods=['GET'], detail=False, url_path='recent-activity-attendance-pie-chart')  
+    def recent_activity_attendance_pie_chart(self, request):
+        data = analytics.recent_activity_attendance_pie_chart()
+        return Response({
+           "type": "success",
+           "data": data
+       })
     
     @action(methods=['GET'], detail=False, url_path='attendance-and-fines-bar-graph')  
     def attendance_and_fines_bar_graph(self, request):
@@ -30,6 +38,8 @@ class AnalyticsView(ViewSet):
            "type": "success",
            "data": data
        })
+        
+    
         
 
     

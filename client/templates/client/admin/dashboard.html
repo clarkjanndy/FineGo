@@ -100,7 +100,7 @@
     <div class="row">
 
         <!-- Area Chart -->
-        <div class="col-xl-8 col-lg-7">
+        <div class="col-xl-7 col-lg-7">
             <div class="card shadow mb-4">
                 <!-- Card Header - Dropdown -->
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
@@ -169,11 +169,11 @@
         </div>
 
         <!-- Pie Chart -->
-        <div class="col-xl-4 col-lg-5">
+        <div class="col-xl-5 col-lg-5">
             <div class="card shadow mb-4">
                 <!-- Card Header - Dropdown -->
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-primary">User Distribution</h6>
+                    <h6 class="m-0 font-weight-bold text-primary">Recent Activity Attendance</h6>
                     <!-- <div class="dropdown no-arrow">
                         <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown"
                             aria-haspopup="true" aria-expanded="false">
@@ -195,7 +195,7 @@
                         <div id="piechart"></div>
                         <script>
                             document.addEventListener("DOMContentLoaded", async () => {
-                                const url = "/api/v1/analytics/user-distribution-pie-chart/"
+                                const url = "/api/v1/analytics/recent-activity-attendance-pie-chart/"
                                 const payload = {
                                     headers: { "X-CSRFToken": "{{csrf_token}}" },
                                     method: 'GET',
@@ -205,12 +205,21 @@
                                 const data = await response.json();
 
                                 var options = {
+                                    title:{
+                                        text: data.data.activity_name,
+                                        align: 'center',
+                                        style: {
+                                            fontSize: '15px',
+                                            fontWeight: 'bold',
+                                            color: '#0d6efd'
+                                        }
+                                    },
                                     legend: {
                                         position: 'bottom',
                                     },
                                     series: data.data.series,
                                     chart: {
-                                        width: 350,
+                                        width: 400,
                                         height: 400,
                                         type: 'pie',
                                     },
@@ -228,7 +237,7 @@
     </div>
 
     <div class="row">
-        <div class="col-xl-8 col-lg-7">
+        <div class="col-xl-7 col-lg-7">
             <div class="card shadow mb-4">
                 <!-- Card Header - Dropdown -->
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
@@ -278,60 +287,11 @@
                 </div>
             </div>
 
-            <div class="card shadow mb-4">
-                <!-- Card Header - Dropdown -->
-                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-primary">Recent Attendance</h6>
-                </div>
-                <!-- Card Body -->
-                <div class="card-body">
-                    <div class="table-responsive">
-
-                        <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-                            <thead>
-                                <tr>
-                                    <th scope="col">#</th>
-                                    <th scope="col">Date</th>
-                                    <th scope="col">Activity</th>
-                                    <th scope="col">User</th>
-                                    <th scope="col">---</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for atr in attendance_recent %}
-                                <tr>
-                                    <th scope="row">{{forloop.counter}}</th>
-                                    <td>{{atr.modified_at|date:"M d, Y"}}</td>
-                                    <td>{{atr.activity.group.name}} - {{atr.activity.name}}</td>
-                                    <td>{{atr.user.get_full_name}}</td>
-                                    <!-- Action Buttons -->
-                                    <td>
-                                        <a
-                                            href="/admin/manage-activities/groups/{{atr.activity.group.pk}}/activities/{{atr.activity.pk}}"
-                                            data-toggle="tooltip" data-placement="right" title="Open Activity">
-                                            <i class="bi bi-arrow-up-right-square-fill" style="font-size: 30px;"></i>
-                                        </a>
-                                    </td>
-                                </tr>
-                                {% empty %}
-                                <tr>
-                                    <td colspan="7">
-                                        <div class="d-flex justify-content-center">Nothing to show here.<div>
-                                    </td>
-                                </tr>
-                                {% endfor %}
-
-                            </tbody>
-                        </table>
-
-                    </div>
-
-                </div>
-            </div>
 
         </div>
 
-        <div class="col-xl-4 col-lg-5">
+        <div class="col-xl-5 col-lg-5">
+
             <div class="card shadow mb-4">
                 <!-- Card Header - Dropdown -->
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
@@ -374,6 +334,57 @@
 
                 </div>
             </div>
+            
+            <div class="card shadow mb-4">
+                <!-- Card Header - Dropdown -->
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Recent Attendance</h6>
+                </div>
+                <!-- Card Body -->
+                <div class="card-body">
+                    <div class="table-responsive">
+
+                        <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Activity</th>
+                                    <th scope="col">User</th>
+                                    <th scope="col">---</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for atr in attendance_recent %}
+                                <tr>
+                                    <th scope="row">{{forloop.counter}}</th>
+                                    <td>{{atr.activity.group.name}} - {{atr.activity.name}}</td>
+                                    <td>{{atr.user.get_full_name}}</td>
+                                    <!-- Action Buttons -->
+                                    <td>
+                                        <a
+                                            href="/admin/manage-activities/groups/{{atr.activity.group.pk}}/activities/{{atr.activity.pk}}"
+                                            data-toggle="tooltip" data-placement="right" title="Open Activity">
+                                            <i class="bi bi-arrow-up-right-square-fill" style="font-size: 30px;"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="7">
+                                        <div class="d-flex justify-content-center">Nothing to show here.<div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+
+                            </tbody>
+                        </table>
+
+                    </div>
+
+                </div>
+            </div>
+
+           
 
         </div>
 
