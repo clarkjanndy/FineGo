@@ -20,7 +20,7 @@ def activity_count(on_going_only: bool = False, return_objects = False):
     return activity_count
 
 def fine_issued():
-    fine_amount: Decimal = Fine.objects.all().aggregate(count = Sum('amount'))['count']
+    fine_amount: Decimal = Fine.objects.exclude(status='removed').aggregate(count = Sum('amount'))['count']
     return fine_amount.quantize(Decimal('0.01')) if fine_amount else 0.00
 
 def fines_per_activity_group(num_rows=10):
