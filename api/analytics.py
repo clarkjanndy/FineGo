@@ -1,7 +1,7 @@
 from decimal import Decimal
 from django.db.models import Count, Sum, F
 
-from api.models import User, Activity, Fine, Department, Attendance
+from api.models import User, Activity, Fine, Department, Attendance, Semester
 
 def user_count(is_admin_included: bool = False):
     user_count = User.objects.filter(is_superuser = is_admin_included).aggregate(count = Count('id'))['count']
@@ -29,6 +29,58 @@ def fines_per_activity_group(num_rows=10):
                values('activity__group__id', 'activity__group__name', 'fines')[:num_rows]
 
     return queryset 
+
+def fines_per_semester(num_rows=10):
+    semesters = Semester.objects.all().order_by('academic_year')
+    categories = []
+    data = []    
+    
+    for semester in semesters:
+        categories.append(semester.__str__())        
+        total_fines = Fine.objects.filter(
+            created_at__date__gte = str(semester.date_open),
+            created_at__date__lte = str(semester.date_close ) 
+        ).exclude(status='removed').aggregate(
+            total_fines = Sum('amount')
+        )['total_fines'] or Decimal(0)
+        
+        data.append(total_fines)
+        
+    series  = [{"name": "Fines", "data": data, "color": "#dc3545"}]
+    return {
+        "series": series,
+        "categories": categories
+    }
+
+def fine_reports():
+    paid_fines = Fine.objects.filter(status='paid').\
+        values('user').annotate(
+            fine_amount = Sum('amount'), 
+            full_name = User.full_name_query(),
+            student_id = F('user__student_id')
+        ).values('student_id', 'full_name', 'fine_amount' )
+        
+    unpaid_fines = Fine.objects.filter(status='unpaid').\
+        values('user').annotate(
+            fine_amount = Sum('amount'), 
+            full_name = User.full_name_query(),
+            student_id = F('user__student_id')
+        ).values('student_id', 'full_name', 'fine_amount' )
+    
+   
+    total_paid_fine = paid_fines.aggregate(amount=Sum('fine_amount'))['amount'] or Decimal(0)
+    total_unpaid_fine = unpaid_fines.aggregate(amount=Sum('fine_amount'))['amount'] or Decimal(0)
+    total_fine = total_paid_fine + total_unpaid_fine
+    
+    return {
+        'paid_fines': paid_fines,
+        'unpaid_fines': unpaid_fines,
+        'aggregates':{
+            'total_paid_fine': total_paid_fine,
+            'total_unpaid_fine': total_unpaid_fine,
+            'total_fine': total_fine
+        }
+    }
 
 def attendance_recent(num_rows=10):
     if not num_rows:
@@ -68,37 +120,7 @@ def attendance_and_fines_bar_graph():
         "series": series,
         "categories": categories
         
-    }    
-
-def fine_reports():
-    paid_fines = Fine.objects.filter(status='paid').\
-        values('user').annotate(
-            fine_amount = Sum('amount'), 
-            full_name = User.full_name_query(),
-            student_id = F('user__student_id')
-        ).values('student_id', 'full_name', 'fine_amount' )
-        
-    unpaid_fines = Fine.objects.filter(status='unpaid').\
-        values('user').annotate(
-            fine_amount = Sum('amount'), 
-            full_name = User.full_name_query(),
-            student_id = F('user__student_id')
-        ).values('student_id', 'full_name', 'fine_amount' )
-    
-   
-    total_paid_fine = paid_fines.aggregate(amount=Sum('fine_amount'))['amount'] or Decimal(0)
-    total_unpaid_fine = unpaid_fines.aggregate(amount=Sum('fine_amount'))['amount'] or Decimal(0)
-    total_fine = total_paid_fine + total_unpaid_fine
-    
-    return {
-        'paid_fines': paid_fines,
-        'unpaid_fines': unpaid_fines,
-        'aggregates':{
-            'total_paid_fine': total_paid_fine,
-            'total_unpaid_fine': total_unpaid_fine,
-            'total_fine': total_fine
-        }
-    }
+    }  
     
 def recent_activity_attendance_pie_chart():
     open_activity = Activity.objects.filter(status='open').order_by('-modified_at').first()

@@ -39,6 +39,14 @@ class AnalyticsView(ViewSet):
            "data": data
        })
         
+    @action(methods=['GET'], detail=False, url_path='fines-per-semester')  
+    def fines_per_semester(self, request):
+        data = analytics.fines_per_semester()
+        return Response({
+           "type": "success",
+           "data": data
+       })
+        
     
         
 

@@ -166,14 +166,12 @@
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Pie Chart -->
-        <div class="col-xl-5 col-lg-5">
+
             <div class="card shadow mb-4">
                 <!-- Card Header - Dropdown -->
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-primary">Recent Activity Attendance</h6>
+                    <h6 class="m-0 font-weight-bold text-primary">Fines per Semester</h6>
                     <!-- <div class="dropdown no-arrow">
                         <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown"
                             aria-haspopup="true" aria-expanded="false">
@@ -192,10 +190,10 @@
                 <!-- Card Body -->
                 <div class="card-body">
                     <div class="">
-                        <div id="piechart"></div>
+                        <div id="areaGraph"></div>
                         <script>
                             document.addEventListener("DOMContentLoaded", async () => {
-                                const url = "/api/v1/analytics/recent-activity-attendance-pie-chart/"
+                                const url = "/api/v1/analytics/fines-per-semester/"
                                 const payload = {
                                     headers: { "X-CSRFToken": "{{csrf_token}}" },
                                     method: 'GET',
@@ -205,39 +203,37 @@
                                 const data = await response.json();
 
                                 var options = {
-                                    title:{
-                                        text: data.data.activity_name,
-                                        align: 'center',
-                                        style: {
-                                            fontSize: '15px',
-                                            fontWeight: 'bold',
-                                            color: '#0d6efd'
-                                        }
-                                    },
-                                    legend: {
-                                        position: 'bottom',
-                                    },
                                     series: data.data.series,
                                     chart: {
-                                        width: 400,
-                                        height: 400,
-                                        type: 'pie',
+                                        type: 'area', // Change to 'bar' for column graph
+                                        height: 350,
+                                        toolbar: {
+                                            show: false
+                                        }
                                     },
-                                    labels: data.data.labels,
+                                    xaxis: {
+                                        categories: data.data.categories
+                                    },
+                                    fill: {
+                                        type: 'gradient',
+                                    },
+                                    dataLabels: {
+                                        enabled: true,
+                                    },
+                                    legend: {
+                                        show: true
+                                    },
+
                                 };
 
-                                var chart = new ApexCharts(document.querySelector("#piechart"), options);
+                                var chart = new ApexCharts(document.querySelector("#areaGraph"), options);
                                 chart.render();
                             });
                         </script>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <div class="row">
-        <div class="col-xl-7 col-lg-7">
             <div class="card shadow mb-4">
                 <!-- Card Header - Dropdown -->
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
@@ -287,10 +283,73 @@
                 </div>
             </div>
 
-
         </div>
 
+        <!-- Pie Chart -->
         <div class="col-xl-5 col-lg-5">
+            <div class="card shadow mb-4">
+                <!-- Card Header - Dropdown -->
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Recent Activity Attendance</h6>
+                    <!-- <div class="dropdown no-arrow">
+                        <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown"
+                            aria-haspopup="true" aria-expanded="false">
+                            <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in"
+                            aria-labelledby="dropdownMenuLink">
+                            <div class="dropdown-header">Dropdown Header:</div>
+                            <a class="dropdown-item" href="#">Action</a>
+                            <a class="dropdown-item" href="#">Another action</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="#">Something else here</a>
+                        </div>
+                    </div> -->
+                </div>
+                <!-- Card Body -->
+                <div class="card-body">
+                    <div class="">
+                        <div id="piechart"></div>
+                        <script>
+                            document.addEventListener("DOMContentLoaded", async () => {
+                                const url = "/api/v1/analytics/recent-activity-attendance-pie-chart/"
+                                const payload = {
+                                    headers: { "X-CSRFToken": "{{csrf_token}}" },
+                                    method: 'GET',
+                                }
+
+                                const response = await fetch(url, payload);
+                                const data = await response.json();
+
+                                var options = {
+                                    title: {
+                                        text: data.data.activity_name,
+                                        align: 'center',
+                                        style: {
+                                            fontSize: '15px',
+                                            fontWeight: 'bold',
+                                            color: '#0d6efd'
+                                        }
+                                    },
+                                    legend: {
+                                        position: 'bottom',
+                                    },
+                                    series: data.data.series,
+                                    chart: {
+                                        width: 400,
+                                        height: 400,
+                                        type: 'pie',
+                                    },
+                                    labels: data.data.labels,
+                                };
+
+                                var chart = new ApexCharts(document.querySelector("#piechart"), options);
+                                chart.render();
+                            });
+                        </script>
+                    </div>
+                </div>
+            </div>
 
             <div class="card shadow mb-4">
                 <!-- Card Header - Dropdown -->
@@ -334,7 +393,6 @@
 
                 </div>
             </div>
-            
             <div class="card shadow mb-4">
                 <!-- Card Header - Dropdown -->
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
@@ -361,8 +419,7 @@
                                     <td>{{atr.user.get_full_name}}</td>
                                     <!-- Action Buttons -->
                                     <td>
-                                        <a
-                                            href="/admin/manage-activities/groups/{{atr.activity.group.pk}}/activities/{{atr.activity.pk}}"
+                                        <a href="/admin/manage-activities/groups/{{atr.activity.group.pk}}/activities/{{atr.activity.pk}}"
                                             data-toggle="tooltip" data-placement="right" title="Open Activity">
                                             <i class="bi bi-arrow-up-right-square-fill" style="font-size: 30px;"></i>
                                         </a>
@@ -384,7 +441,21 @@
                 </div>
             </div>
 
-           
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xl-7 col-lg-7">
+
+
+
+        </div>
+
+        <div class="col-xl-5 col-lg-5">
+
+
+
+
 
         </div>
 
