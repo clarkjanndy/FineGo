@@ -46,15 +46,15 @@ def attendance_and_fines_bar_graph():
     ).annotate(
         attendance_count = Count('members__attendance'),
         fines_count = Count('members__fines'),        
-    ).values('name', 'attendance_count', 'fines_count').order_by("name")
+    ).values('abbreviation', 'attendance_count', 'fines_count').order_by("abbreviation")
     
     # create categories
-    categories = [q['name'] for q in qs]
+    categories = [q['abbreviation'] for q in qs]
     series = []
     # create series
-    attendance_series = {"name": "Attendance","data": [a['attendance_count'] for a in qs] }
+    attendance_series = {"name": "Attendance","data": [a['attendance_count'] for a in qs], "color": '#0d6efd'}
     series.append(attendance_series)
-    fines_series = {"name": "Fines", "data": [f['fines_count'] for f in qs]}
+    fines_series = {"name": "Fines", "data": [f['fines_count'] for f in qs], "color": "#dc3545"}
     series.append(fines_series)
     
     return {
