@@ -56,6 +56,6 @@ urlpatterns = [
     # Fine
     path('fines/<int:pk>', views.FineById.as_view()),
     
-    
-
+    # Reports
+    path('report-pdf/', views.ReportPDF.as_view()),
 ]

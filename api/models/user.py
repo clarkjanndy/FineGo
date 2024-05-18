@@ -1,4 +1,6 @@
 from django.db import models
+from django.db.models import F, Value
+from django.db.models.functions import Concat
 from django.contrib.auth.models import AbstractUser
 from django.conf import settings
 
@@ -65,3 +67,15 @@ class User(AbstractUser):
     @property
     def default_photo_url(self):        
         return f"{settings.STATIC_URL}client/img/default-profile.webp"
+    
+    @staticmethod
+    def full_name_query():
+        return Concat(
+            F('user__first_name'),
+            Value(' '),
+            F('user__middle_name'), 
+            Value(' '),
+            F('user__last_name'),
+                Value(' '),
+            F('user__suffix')
+        )

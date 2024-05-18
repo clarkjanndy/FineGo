@@ -1,0 +1,157 @@
+{% load static %}
+{% load humanize %}
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Sales and Expense Report</title>
+</head>
+
+<style>
+    .center {
+        text-align: center;
+    }
+
+    .bordered-table {
+        border: 1px solid gray;
+    }
+
+    .padded-td {
+        padding-top: 2px;
+        padding-left: 2px;
+    }
+
+    .part-header{
+        background-color: #012970;
+        color: white;
+        font-weight: bold;
+    }
+
+    .table-header{
+        font-weight: bold;
+    }
+
+</style>
+
+<body>
+    <!-- Heading -->
+    <table class="center">
+        <tr>
+            <td>
+                <img src="{{base_64_bcc_logo}}" alt="" width="100">
+            </td>
+            <td>
+                Republic of the Phillipines<br>
+                Province of Bohol<br>
+                Municipality of Buenavista<br>
+                Buenavista Community College<br>
+                FineGO<br>
+                Date: <u>{% now "F d, Y" %}</u>
+            </td>
+            <td>
+                <img src="{{base_64_finego_logo}}" alt="" width="150">
+            </td>
+        </tr>
+        <tr>
+            <td colspan="3">
+                <br>
+                <h1>Fines Report</h1>
+                <!-- <h5>Period: <u>{{data.period.date_from|default:""}} - {{data.period.date_to|default:""}}</u></h5> -->
+                <br>
+            </td>
+        </tr>
+    </table>
+
+    <!-- Contents  starts here-->
+
+    <!-- Sales -->
+    <table class="bordered-table">
+        <!-- Part Heading -->
+        <tr class="part-header">
+            <td class="padded-td" colspan="3">Part I. List of Paid Fines</td>
+        </tr>
+
+        <!-- Table Headers -->
+        <tr class="table-header"> 
+            <td class="padded-td">Name</td>
+            <td class="padded-td">Student ID</td>
+            <td class="padded-td">Amount</td>
+        </tr>
+
+        <!-- Table Contents -->
+        {% for student in data.paid_fines %}
+        <tr>
+            <td class="padded-td">{{student.full_name}}</td>
+            <td class="padded-td">{{student.student_id}}</td>
+            <td class="padded-td">{{student.fine_amount|floatformat:"2"|intcomma}}</td>
+        </tr>
+        {% endfor %}
+
+        <!-- Table Footer -->
+        <tr> 
+            <td class="padded-td" colspan="2"><b>Total</b></td>
+            <td class="padded-td"><b>{{data.aggregates.total_paid_fine|floatformat:"2"|intcomma}}</b></td>
+        </tr>
+    </table>
+
+    <br>
+
+    <table class="bordered-table">
+        <!-- Part Heading -->
+        <tr class="part-header">
+            <td class="padded-td" colspan="3">Part II. List of Unpaid Fines</td>
+        </tr>
+
+        <!-- Table Headers -->
+        <tr class="table-header"> 
+            <td class="padded-td">Name</td>
+            <td class="padded-td">Student ID</td>
+            <td class="padded-td">Amount</td>
+        </tr>
+
+        <!-- Table Contents -->
+        {% for student in data.unpaid_fines %}
+        <tr>
+            <td class="padded-td">{{student.full_name}}</td>
+            <td class="padded-td">{{student.student_id}}</td>
+            <td class="padded-td">{{student.fine_amount|floatformat:"2"|intcomma}}</td>
+        </tr>
+        {% endfor %}
+
+        <!-- Table Footer -->
+        <tr> 
+            <td class="padded-td" colspan="2"><b>Total</b></td>
+            <td class="padded-td"><b>{{data.aggregates.total_unpaid_fine|floatformat:"2"|intcomma}}</b></td>
+        </tr>
+    </table>
+    
+    <br>
+
+    <!-- Summary -->
+    <table class="bordered-table">
+        <!-- Part Heading -->
+        <tr class="part-header">
+            <td class="padded-td" colspan="2">Part III. Summary</td>
+        </tr>
+
+        <!-- Table Headers -->
+        <tr class="table-header"> 
+            <td class="padded-td">Paid Fines</td>
+            <td class="padded-td">{{data.aggregates.total_paid_fine|floatformat:"2"|intcomma}}</td>
+        </tr>
+
+        <tr class="table-header"> 
+            <td class="padded-td">Unpaid Fines</td>
+            <td class="padded-td">{{data.aggregates.total_unpaid_fine|floatformat:"2"|intcomma}}</td>
+        </tr>
+
+        <tr class="table-header"> 
+            <td class="padded-td"><h1>Total Fines</h1></td>
+            <td class="padded-td"><h1>{{data.aggregates.total_fine|floatformat:"2"|intcomma}}</h1></td>
+        </tr>
+
+    </table>
+
+</body>
+
+</html>

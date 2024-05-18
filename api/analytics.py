@@ -3,7 +3,6 @@ from django.db.models import Count, Sum, F
 
 from api.models import User, Activity, Fine, Department, Attendance
 
-
 def user_count(is_admin_included: bool = False):
     user_count = User.objects.filter(is_superuser = is_admin_included).aggregate(count = Count('id'))['count']
     return user_count
@@ -69,4 +68,34 @@ def attendance_and_fines_bar_graph():
         "series": series,
         "categories": categories
         
+    }    
+
+def fine_reports():
+    paid_fines = Fine.objects.filter(status='paid').\
+        values('user').annotate(
+            fine_amount = Sum('amount'), 
+            full_name = User.full_name_query(),
+            student_id = F('user__student_id')
+        ).values('student_id', 'full_name', 'fine_amount' )
+        
+    unpaid_fines = Fine.objects.filter(status='unpaid').\
+        values('user').annotate(
+            fine_amount = Sum('amount'), 
+            full_name = User.full_name_query(),
+            student_id = F('user__student_id')
+        ).values('student_id', 'full_name', 'fine_amount' )
+    
+   
+    total_paid_fine = paid_fines.aggregate(amount=Sum('fine_amount'))['amount'] or Decimal(0)
+    total_unpaid_fine = unpaid_fines.aggregate(amount=Sum('fine_amount'))['amount'] or Decimal(0)
+    total_fine = total_paid_fine + total_unpaid_fine
+    
+    return {
+        'paid_fines': paid_fines,
+        'unpaid_fines': unpaid_fines,
+        'aggregates':{
+            'total_paid_fine': total_paid_fine,
+            'total_unpaid_fine': total_unpaid_fine,
+            'total_fine': total_fine
+        }
     }
