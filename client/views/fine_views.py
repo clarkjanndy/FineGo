@@ -13,16 +13,27 @@ class UserFines(LoginRequiredMixin, ListView):
     paginate_by = 10
     ordering = ('-modified_at', )
     
-    def get_fine_amount(self):
+    def fines_aggregate(self):
         total_fines = self.queryset.filter(user = self.request.user).\
-            aggregate(total_amount=Sum('amount'))
-    
-        return total_fines.get("total_amount", 0)
+            exclude(status = 'removed').\
+            aggregate(amount=Sum('amount'))['amount']
+            
+        paid_fines = self.queryset.filter(user = self.request.user, status='paid').\
+            aggregate(amount=Sum('amount'))['amount']
+                        
+        unpaid_fines = self.queryset.filter(user = self.request.user, status='unpaid').\
+            aggregate(amount=Sum('amount'))['amount']
+            
+        return {
+            "total_fines": total_fines,
+            "paid_fines": paid_fines,
+            "unpaid_fines": unpaid_fines
+        }
         
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update({'current_page': 'my-fines'})
-        context.update({'total_fines': self.get_fine_amount()})
+        context.update({'fines_aggregate': self.fines_aggregate()})
         return context
 
     def get_queryset(self):
@@ -43,8 +54,7 @@ class UserFines(LoginRequiredMixin, ListView):
         if 'q' in params:
             queryset = queryset.filter(
                 Q(activity__name__icontains = params['q']) |
-                Q(activity__group__name__icontains = params['q']) |
-                Q(amount__icontains = params['q'])
+                Q(activity__group__name__icontains = params['q'])
             )
         return queryset
     

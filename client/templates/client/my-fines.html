@@ -70,7 +70,12 @@
                 </table>
 
                 <div class="d-flex justify-content-end mt-3 mb-3">
-                    <h4>Total Fines: &#x20B1; {{total_fines|floatformat:"2"|intcomma|default:0}}</h4>
+                    <div>
+                        <h5>&#x20B1; {{fines_aggregate.total_fines|floatformat:"2"|intcomma|default:0}} - total fines</h5>
+                        <h5>&#x20B1; {{fines_aggregate.paid_fines|floatformat:"2"|intcomma|default:0}} - paid fines</h5>
+                        <hr>
+                        <h4><b>&#x20B1; {{fines_aggregate.unpaid_fines|floatformat:"2"|intcomma|default:0}} - outsanding fines</b></h4>
+                    </div>
                 </div>
 
                 {% include 'client/components/paginator.html' %}
