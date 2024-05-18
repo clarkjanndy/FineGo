@@ -23,6 +23,14 @@ def fine_issued():
     fine_amount: Decimal = Fine.objects.all().aggregate(count = Sum('amount'))['count']
     return fine_amount.quantize(Decimal('0.01')) if fine_amount else 0.00
 
+def fines_per_activity_group(num_rows=10):
+    queryset = Fine.objects.select_related('activity').\
+               values('activity__group').\
+               annotate(fines = Sum('amount')).\
+               values('activity__group__id', 'activity__group__name', 'fines')[:num_rows]
+
+    return queryset 
+
 def attendance_recent(num_rows=10):
     if not num_rows:
         return []

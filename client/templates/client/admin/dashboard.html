@@ -232,6 +232,55 @@
             <div class="card shadow mb-4">
                 <!-- Card Header - Dropdown -->
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Fines per Activity Group</h6>
+                </div>
+                <!-- Card Body -->
+                <div class="card-body">
+                    <div class="table-responsive">
+
+                        <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Name</th>
+                                    <th scope="col">Total Fine</th>
+                                    <th scope="col">---</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for atr in fines_per_activity_group %}
+                                <tr>
+                                    <th scope="row">{{forloop.counter}}</th>
+                                    <td>{{atr.activity__group__name}}</td>
+                                    <td>&#8369; {{atr.fines}}</td>
+                                    <!-- Action Buttons -->
+                                    <td>
+                                        <a
+                                            href="/admin/manage-activities/groups/{{atr.activity__group__id}}"
+                                            data-toggle="tooltip" data-placement="right" title="Open Activity Group">
+                                            <i class="bi bi-arrow-up-right-square-fill" style="font-size: 30px;"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="7">
+                                        <div class="d-flex justify-content-center">Nothing to show here.<div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+
+                            </tbody>
+                        </table>
+
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="card shadow mb-4">
+                <!-- Card Header - Dropdown -->
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                     <h6 class="m-0 font-weight-bold text-primary">Recent Attendance</h6>
                 </div>
                 <!-- Card Body -->
@@ -258,8 +307,10 @@
                                     <!-- Action Buttons -->
                                     <td>
                                         <a
-                                            href="/admin/manage-activities/groups/{{atr.activity.group.pk}}/activities/{{atr.activity.pk}}">Go
-                                            To Activity</a>
+                                            href="/admin/manage-activities/groups/{{atr.activity.group.pk}}/activities/{{atr.activity.pk}}"
+                                            data-toggle="tooltip" data-placement="right" title="Open Activity">
+                                            <i class="bi bi-arrow-up-right-square-fill" style="font-size: 30px;"></i>
+                                        </a>
                                     </td>
                                 </tr>
                                 {% empty %}
@@ -333,6 +384,12 @@
 <!-- /.container-fluid -->
 <!-- Page level plugins -->
 <script src="{%static 'client/vendor/others/apexcharts.min.js'%}"></script>
+
+<script>
+    $(function () {
+        $('[data-toggle="tooltip"]').tooltip()
+    })
+</script>
 
 <!-- Page level custom scripts -->
 <!-- <script src="{%static 'client/js/demo/chart-area-demo.js'%}"></script> -->
