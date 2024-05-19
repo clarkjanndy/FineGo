@@ -1,0 +1,200 @@
+{% extends "client/app.html"%}
+
+{% load static %}
+
+{% load humanize %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+    <!-- Page Heading -->
+    <div>
+        <h1 class="h3 mb-0 text-gray-800">Manage Fines</h1>
+
+        <div aria-label="breadcrumb">
+            <ol class="breadcrumb" style="background-color: inherit;">
+                <li class="breadcrumb-item active" aria-current="page">Manage Fines</li>
+                <li class="breadcrumb-item active" aria-current="page">{{fines_user.get_full_name}}</li>
+                <li class="breadcrumb-item active" aria-current="page"></li>
+            </ol>
+        </div>
+    </div>
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">List of Fines</h6>
+        </div>
+        <div class="card-body">
+
+
+            <div class="table-responsive">
+
+                {% include 'client/components/table_search.html' %}
+
+                <div class="mb-3 p-3">
+                    <div class="row">
+                        <div class="col-lg-2 col-md-4 label">Student Id:</div>
+                        <div class="col-lg-10 col-md-8">{{fines_user.student_id}}</div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-2 col-md-4 label">Department:</div>
+                        <div class="col-lg-10 col-md-8">{{fines_user.department.name}}</div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-2 col-md-4 label">Full Name:</div>
+                        <div class="col-lg-10 col-md-8">{{fines_user.get_full_name}}</div>
+                    </div>
+                </div>
+
+                <!-- Django messages -->
+                {% if messages %}
+                {% for message in messages %}
+                {% include 'client/components/alert.html' %}
+                {% endfor %}
+                {% endif %}
+
+                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Activity Group</th>
+                            <th scope="col">Activity</th>
+                            <th scope="col">Amount</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Created At</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for fine in fine_list %}
+                        <tr>
+                            <th scope="row">{{forloop.counter}}</th>
+                            <td>{{fine.activity.group}}</td>
+                            <td>{{fine.activity}}</td>
+                            <td>&#8369; {{fine.amount|floatformat:"2"|intcomma|default:0}}</td>
+                            <td><span class="badge badge-{{fine.status_color}}">{{fine.status}}</span></td>
+                            <td>
+                                <button record-id="{{fine.id}}" type="button" class="btn btn-success btn-sm"
+                                    data-toggle="tooltip" data-placement="bottom" title="Mark as paid" action="paid"
+                                    {% if fine.status == "paid" %} disabled {% endif %} onclick="handleUpdateStatus(this)">
+                                    <i class="bi bi-check-circle"></i>
+                                </button>
+
+                                <button record-id="{{fine.id}}" type="button" class="btn btn-primary btn-sm"
+                                    data-toggle="tooltip" data-placement="bottom" title="Mark as unpaid" action="unpaid"
+                                    {% if fine.status == "unpaid" %} disabled {% endif %} onclick="handleUpdateStatus(this)">
+                                    <i class="bi bi-x-circle"></i>
+                                </button>
+
+                                <button record-id="{{fine.id}}" type="button" class="btn btn-danger btn-sm"
+                                    data-toggle="tooltip" data-placement="bottom" title="Mark as removed" action="removed"
+                                    {% if fine.status == "removed" %} disabled {% endif %} onclick="handleUpdateStatus(this)">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6">
+                                <div class="d-flex justify-content-center">Nothing to show here.<div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+
+                    </tbody>
+                </table>
+
+                <div class="d-flex justify-content-end mt-3 mb-3">
+                    <div>
+                        <h5>&#x20B1; {{fines_aggregate.total_fines|floatformat:"2"|intcomma|default:0}} - total fines
+                        </h5>
+                        <h5>&#x20B1; {{fines_aggregate.paid_fines|floatformat:"2"|intcomma|default:0}} - paid fines</h5>
+                        <hr>
+                        <h4><b>&#x20B1; {{fines_aggregate.unpaid_fines|floatformat:"2"|intcomma|default:0}} - unpaid
+                                fines</b></h4>
+                    </div>
+                </div>
+
+                {% include 'client/components/paginator.html' %}
+
+            </div>
+        </div>
+    </div>
+
+<script script src=" {% static 'client/vendor/others/sweetalert.min.js' %}"></script>
+<script>
+    $(function () {
+        $('[data-toggle="tooltip"]').tooltip()
+    })
+</script>
+
+<script>
+    const handleUpdateStatus = async (button) => {
+        const recordID = button.getAttribute('record-id');
+        const action = button.getAttribute('action');
+
+        const result = await Swal.fire({
+            title: "Are you sure?",
+            text: `This action will mark this fine as ${action}`,
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: `Yes, mark it  as ${action}`
+        })
+
+        if (result.isConfirmed){
+            const url = `/api/v1/fines/${recordID}`; 
+            const payload =  {
+                headers: {
+                    "X-CSRFToken":  "{{csrf_token}}",
+                    "Content-Type": 'application/json'
+                },
+                method: 'PATCH',
+                body: JSON.stringify({
+                    status: action
+                })
+            }
+            const response = await fetch(url, payload)
+            const data = await response.json();
+
+            if (data.status === 'success'){
+                //redirect to user profile
+                location.reload()
+            }
+        }
+        
+        // .then((result) => {
+        //     if (result.isConfirmed) {
+        //         // Make your API call here (e.g., using the fetch() method)
+        //         const url = `/api/v1/users/${recordID}/activate-or-deactivate`;
+        //         const payload = {
+        //             headers: {
+        //                 "X-CSRFToken": "{{csrf_token}}"
+        //             },
+        //             method: 'PATCH',
+        //         }
+        //         fetch(url, payload)
+        //             .then(response => response.json())
+        //             .then(response => {
+        //                 // reload page to get fresh data
+        //                 location.reload();
+        //             })
+        //             .catch(error => {
+        //                 Swal.fire({
+        //                     icon: 'error',
+        //                     title: 'Oops...',
+        //                     text: 'Something went wrong!',
+        //                     confirmButtonColor: '#4154f1',
+        //                 })
+        //             });
+        //     }
+        // );
+    };
+</script>
+
+
+
+</div>
+
+
+{%endblock content%}

@@ -2,6 +2,8 @@
 
 {% load static %}
 
+{% load humanize %}
+
 {% block content %}
 
 <div class="container-fluid">
@@ -53,11 +55,9 @@
                     <thead>
                         <tr>
                             <th scope="col">#</th>
+                            <th scope="col">Student ID</th>
                             <th scope="col">User</th>
-                            <th scope="col">Activity</th>
                             <th scope="col">Amount</th>
-                            <th scope="col">Status</th>
-                            <th scope="col">Date Created</th>
                             <th scope="col">Actions</th>
                         </tr>
                     </thead>
@@ -65,17 +65,19 @@
                         {% for fine in fine_list %}
                         <tr>
                             <th scope="row">{{forloop.counter}}</th>
-                            <td>{{fine.user.get_full_name}}</td>                            
-                            <td><b>{{fine.activity.group.name}}</b> - {{fine.activity}}</td>
-                            <td>{{fine.amount}}</td>        
-                            <td><span class="badge badge-{{fine.status_color}}">{{fine.status}}</span></td>               
-                            <td>{{fine.created_at|date:"M d, Y"}}</td>
+                            <td>{{fine.student_id}}</td>                            
+                            <td>{{fine.user_full_name}}</td>
+                            <td>&#8369; {{fine.fine_amount|floatformat:"2"|intcomma}}</td>        
                             <!-- Action Buttons -->
                             <td>
-                                <button record-id="{{fine.id}}" type="button" class="btn btn-primary btn-sm"
+                                <!-- <button record-id="{{fine.id}}" type="button" class="btn btn-primary btn-sm"
                                     data-toggle="modal" data-target="#viewFineModal">
                                     <i class="bi bi-pencil-square"></i>
-                                </button>
+                                </button> -->
+
+                                <a class="btn btn-success btn-sm" href="/admin/manage-fines/{{fine.user}}">
+                                    <i class="bi bi-eye"></i>
+                                </a>
                             </td>
                         </tr>
                         {% empty %}
