@@ -80,14 +80,8 @@ class FineList(AdminRequiredMixin, ListView):
         # Set the paginate_by attribute to the desired page size
         self.paginate_by = page_size
 
-        queryset = super().get_queryset()
-        queryset = queryset.exclude(status = 'removed').\
-            values('user').annotate(
-                fine_amount = Sum('amount'), 
-                user_full_name = User.full_name_query(),
-                student_id = F('user__student_id'),
-            ).order_by('user_full_name')
-                
+        queryset = super().get_queryset()      
+                  
         # Filter results
         if 'q' in params:
             queryset = queryset.filter(

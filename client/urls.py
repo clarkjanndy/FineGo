@@ -45,7 +45,7 @@ urlpatterns = [
     
     #Fines
     path('admin/manage-fines', views.FineList.as_view()),    
-    path('admin/manage-fines/<int:user_id>', views.FinesByUser.as_view()),    
+    # path('admin/manage-fines/<int:user_id>', views.FinesByUser.as_view()),    
     
     # Manage Activities
     path('admin/manage-activities', RedirectView.as_view(url='/admin/manage-activities/groups', permanent=False)),
